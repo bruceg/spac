@@ -1,0 +1,9 @@
+# If the ChangeLog exists, add it to the distribution.
+# If it contains a Subversion header, regenerate it.
+try:
+	line = open('ChangeLog').readline()
+	file('ChangeLog')
+	if re.match(r'^-+\s*$', line):
+		os.system('svn log --verbose -r HEAD:1 >ChangeLog')
+except IOError:
+	pass

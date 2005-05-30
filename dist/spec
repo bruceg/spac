@@ -1,0 +1,33 @@
+spec = open('spec').read()
+spec = string.replace(spec, '@PACKAGE@', package)
+spec = string.replace(spec, '@VERSION@', version)
+badpaths = {
+	' /tmp':            '_tmppath',
+	'/usr/bin':        '_bindir',
+	'/usr/man':        '_mandir',
+	'/usr/sbin':       '_sbindir',
+	'/usr/libexec':    '_libexecdir',
+	'/usr/share':      '_datadir',
+	'/usr/etc':        '_sysconfdir',
+	'/usr/com':        '_sharedstatedir',
+	'/usr/lib':        '_libdir',
+	'/usr/include':    '_includedir',
+	'/usr/info':       '_infodir',
+	#'$RPM_BUILD_DIR':  '_builddir',
+	#'$RPM_BUILD_ROOT': 'buildroot',
+	#'$RPM_OPT_FLAGS':  'optflags',
+	#'$RPM_SOURCE_DIR': '_sourcedir',
+	#'$RPM_':           'something!',
+	}
+errors = 0
+for path,var in badpaths.items():
+	if spec.find(path) >= 0:
+		print "Warning: Replace %s with '%%{%s}'" % (path, var)
+if spec.find('\nBuildRequires: bglibs') < 0:
+	print "Warning: spec file is missing bglibs reference"
+	#errors += 1
+if errors:
+	print "%d errors in the spec file." % errors
+	import sys
+	fail()
+file('%s-%s.spec' % (package, version), spec)

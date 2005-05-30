@@ -1,0 +1,3 @@
+: load insthier.o
+./load insthier -lbg-instshow
+mv insthier instshow

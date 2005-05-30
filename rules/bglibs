@@ -1,0 +1,3 @@
+: conf-bglibs
+rm -f bglibs
+ln -s "`head -n 1 conf-bglibs`" bglibs

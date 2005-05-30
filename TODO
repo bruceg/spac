@@ -1,0 +1,30 @@
+- Fix spac to include =x and =l files in package.
+
+- Fix spac-sysdeps to account for new bglibs code.
+
+- Make a new top target (named TOP?) that isn't listed in the makefile.
+  - This will allow multiple visible top-level targets.
+  - Need to figure out how to choose the default.
+    - Make DEFAULT a special target?
+
+- Actually read the DEFAULT rule and add it to the top of the Makefile.
+
+- Add system dependancy for sys_errlist and sys_nerr.
+
+- Modify fork.h[12] to use pid_t instead of just int.
+
+- Modify files.py to copy the file in on open rather than on read?
+
+- Modify recurse_deps so it makes no global data changes, only recurses
+  the dependancies and returns a new dictionary
+
+- Modify recurse_dep so it recurses any sub-dependancies itself, and it
+  returns a dictionary of targets or None.
+
+- Modify files.py to only identify the files that need writing, and
+  write the files as a "post" step.
+
+- Modify rules.py to return a list of possible rules.
+
+- Modify recurse_dep to recursively try each rule from the list of rules
+  until one succeeds completely.

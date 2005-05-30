@@ -1,0 +1,16 @@
+#!/usr/bin/python2
+import string
+import os
+
+def rmlist(listname, type):
+	try:
+		list = map(string.rstrip, open(listname).readlines())
+	except IOError:
+		return
+	for filename in list:
+		try:
+			os.unlink(filename)
+			print "Removed %s file '%s'" % (type, filename)
+		except: pass
+rmlist('TARGETS', 'target')
+rmlist('AUTOFILES', 'automatic')

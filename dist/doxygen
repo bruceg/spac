@@ -1,0 +1,10 @@
+re_dxydir = re.compile(r'^OUTPUT_DIRECTORY\s*=\s*(\S+)$', re.MULTILINE)
+if os.path.exists('config.dxy'):
+	c = open('config.dxy').read()
+	m = re_dxydir.search(c)
+	if m:
+		dxydir = m.group(1)
+		if os.system('rm -rf %s && doxygen config.dxy'%dxydir) != 0:
+			raise SystemError, "doxygen processing failed"
+		file('config.dxy')
+		dir(dxydir)

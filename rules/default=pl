@@ -1,0 +1,5 @@
+dependon([target+'.pl'])
+dependon(readlist(target+'=pl', dir))
+: perl-head.pl
+cat %(deplist)s >%(target)s
+chmod 755 %(target)s

@@ -1,0 +1,3 @@
+: load insthier.o
+./load insthier -lbg-instcheck
+mv insthier instcheck

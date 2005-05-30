@@ -1,0 +1,3 @@
+: conf-bgincs
+rm -f bgincs
+ln -s "`head -n 1 conf-bgincs`" bgincs

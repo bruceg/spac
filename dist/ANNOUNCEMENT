@@ -1,0 +1,40 @@
+execfile('makedist.py')
+
+re_line = re.compile('^------+$', re.MULTILINE)
+re_changes = re.compile('^Changes in version %s'%version,
+						re.MULTILINE|re.IGNORECASE)
+line = '------------------------------------------------------------------------------\n'
+ann = '''Version %(version)s of %(package)s is now available at:
+	http://%(WEBSITE)s/%(package)s/
+''' % vars() + line
+
+#if LISTSUB:
+#	ann = ann + '''
+#See the documentation there for more details,
+#or join the mailing list by sending an email to:
+#	%(LISTSUB)s
+#''' % vars()
+
+#if LISTURL:
+#	ann = ann + '''
+#A web-browsable archive of the mailing list is available at:
+#	%(LISTURL)s
+#''' % vars()
+
+news = open('NEWS').read()
+start = re_changes.search(news)
+if start:
+	end = re_line.search(news, start.start())
+	if end:
+		ann = ann + news[start.start():end.end()] + '\n'
+	else:
+		ann = ann + news[start.start():]
+
+today = '%04i-%02i-%02i' % time.localtime(time.time())[:3]
+ann = ann + open('README').read() \
+		.replace('@VERSION@', version) \
+		.replace('@TODAY@', today) \
+		.replace('@PACKAGE@', package)
+
+open('ANNOUNCEMENT', 'w').write(ann)
+file('ANNOUNCEMENT', ann)

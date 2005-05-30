@@ -1,0 +1,2 @@
+: TARGETS
+rm -f `cat TARGETS`

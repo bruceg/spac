@@ -1,0 +1,15 @@
+cmd_extra = ''
+lib_extra = ''
+libs = ''
+if not os.path.exists('no-bglibs'):
+	dependon(['conf-bglibs'])
+	cmd_extra = 'bglibs=`head -n 1 conf-bglibs`;'
+	lib_extra = '"-L\'$${bglibs}\'"'
+	libs = '-lbg-sysdeps'
+: conf-ld
+( %(cmd_extra)s \
+  echo '#!/bin/sh';\
+  echo 'main="$$1"; shift';\
+  echo exec `head -n 1 conf-ld` -L. %(lib_extra)s '-o "$$main" "$$main.o" $${1+"$$@"}' %(libs)s; \
+) >load
+chmod 755 load

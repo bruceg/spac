@@ -1,0 +1,4 @@
+files(glob('*.html'))
+for texi in glob('*.texi'):
+	base = texi[:-5]
+	files([base+'.info', base+'.html'])

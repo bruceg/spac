@@ -1,0 +1,37 @@
+#!/usr/bin/python2
+import getopt
+import string
+import sys
+
+from WriteFile import WriteFile
+import rules
+import makemake
+import makefile
+
+opt_makedist = 0
+opt_verbose = 0
+
+def die(msg):
+	raise SystemExit, "spac: Error: %s" % msg
+
+try:
+	(opts, args) = getopt.getopt(sys.argv[1:], 'v')
+except getopt.error, msg:
+	print "spac: Error:", msg
+	print "spac: Usage: spac [-v]"
+	print "  -v  Show verbose build messages"
+	sys.exit(1)
+
+for (option,value) in opts:
+	if option == '-v':
+		opt_verbose = 1
+
+makemake.opt_debug = opt_verbose
+
+rules.load_all()
+( targets, srcfiles, autofiles ) = makemake.make_targets()
+
+makefile.write(targets)
+WriteFile('TARGETS').writelist(targets.keys()).close()
+WriteFile('SRCFILES').writelist(srcfiles).close()
+WriteFile('AUTOFILES').writelist(autofiles).close()

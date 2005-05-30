@@ -1,0 +1,4 @@
+if os.path.isdir('tests') and os.path.exists('tests.inc') and os.path.exists('tests.sh'):
+	#files(['tests.inc', 'tests.sh'])
+	#dir('tests')
+	file('tests.sh')

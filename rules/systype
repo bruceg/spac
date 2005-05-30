@@ -1,0 +1,6 @@
+: warn-auto.sh find-systype.sh conf-cc conf-ld trycpp.c x86cpuid.c
+( cat warn-auto.sh; \
+  echo CC=\'`head -n 1 conf-cc`\'; \
+  echo LD=\'`head -n 1 conf-ld`\'; \
+  cat find-systype.sh; \
+) | sh > systype

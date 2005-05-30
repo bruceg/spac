@@ -1,0 +1,115 @@
+<html>
+
+<head>
+<title>spac: Simple Package Configuration</title>
+<meta name="kewords" content="package configuration autoconf
+automake">
+</head>
+
+<body>
+
+<p><a href="spac.html">spac</a></p>
+
+<h1>rules: Rules describing building targets</h1>
+
+<hr>
+
+<p>Each file in the <tt><a href="rules/">rules</a></tt> directory
+describes makefile rule to build a target.
+There are three types of rules:<ol>
+
+<li>Static rules describe a single target.  They are stored in files
+named the same as that target.
+
+<li>Pattern rules describe a set of targets.  Currently the only
+supported pattern is is dot-extension matching.  Pattern rules are
+named <tt>default.EXT</tt>, where <tt>EXT</tt> is the extension to
+match.
+
+<li>Default rules describe targets on a try-fail basis - each default
+rule is tried until one completes without raising an exception, and
+its result is used.  Default rules are named <tt>default=EXT</tt>,
+where <tt>EXT</tt> has is unused.
+
+</ol></p>
+
+<p>When a target matching one of the above rules shows up as a
+dependancy for another target, the rule will be copied into the
+makefile, and makemake will attempt to recursively satisfy all
+dependancies of the rule, either with other rules, with files from the
+<tt><a href="files.html">files</a></tt> directory, or with source
+files.</p>
+
+<p>These rule files are composed of three sections:<ol>
+
+<li>All lines up to the first line starting with a colon (<tt>:</tt>),
+if present, are Python commands, and are executed in the Python
+interpreter.
+
+<li>The first line starting with a colon seperates the Python commands
+from the make commands.  Everything following the colon on that line
+is prepended to the list of dependancies.
+
+<li>The remaining lines contain the make commands used to build this
+target or pattern.  They will be indented automatically when they are
+written out to the makefile.
+
+</ol></p>
+
+<p>The following objects are defined for use in the Python code:
+<table border=1>
+
+<tr> <th>Name</th> <th>Type</th> <th>Description</th></tr>
+
+<tr> <td>base</td> <td>Global</td> <td>If this is a pattern rule,
+the target filename stripped of its extension, otherwise
+<tt>None</tt>.</td> </tr>
+
+<tr> <td>command(cmd)</td> <td>Function</td> <td>Adds the command to
+the list of commands for make to execute.</td> </tr>
+
+<tr> <td>dir</td> <td>Global</td> <td>The directory prefix to the
+target</td> </tr>
+
+<tr> <td>dependon(item)</td> <td>Function</td> <td>Adds the item
+(which may be a list) to the end of the dependancies list.</td> </tr>
+
+<tr> <td>glob(pattern)</td> <td>Function</td> <td>Returns a list of
+files matching the given pattern</td> </tr>
+
+<tr> <td>os</td> <td>Module</td> <td>Standard OS module</td> </tr>
+
+<tr> <td>re</td> <td>Module</td> <td>Standard regular expression
+module</td> </tr>
+
+<tr> <td>readlist(filename[, dirname])</td> <td>Function</td>
+<td>Opens the file, reads its contents as a list of lines, and strips
+off all the trailing newlines and whitespace.  If <tt>dirname</tt> is
+set, all files in the returned list are prefixed with that directory
+name.  All returned filenames are normalized to remove
+<tt>dir/../</tt>.</td> </tr>
+
+<tr> <td>string</td> <td>Module</td> <td>Standard string module</td> </tr>
+
+<tr> <td>target</td> <td>Global</td> <td>The filename of the target
+of this rule.</td> </tr>
+
+</table></p>
+
+<p>The following string substitutions may be used in either the
+dependancy line or any of the make commands following it:<ul>
+
+<li><tt>%(base)s</tt> inserts the target file name stripped of its
+extension.
+
+<li><tt>%(deplist)s</tt> inserts a space-seperated list of all of the
+dependancies.
+
+<li><tt>%(deplist_pre)s</tt> inserts a space-seperated list of all the
+dependancies except for those listed on the dependancy line.
+
+<li><tt>%(target)s</tt> inserts the target file name.
+
+</ul>
+In addition, any of the variables created in the Python code section
+above may be inserted by the same method.</p>

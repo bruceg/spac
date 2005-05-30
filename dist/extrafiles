@@ -1,0 +1,6 @@
+if os.path.exists('EXTRADIST'):
+	for path in readlist('EXTRADIST'):
+		if os.path.isdir(path):
+			dir(path)
+		else:
+			file(path)

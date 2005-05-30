@@ -1,0 +1,3 @@
+/usr/local/include
+
+C header files will be installed in this directory.

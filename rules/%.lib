@@ -1,0 +1,4 @@
+: compile load trylib.c
+( ( ./compile trylib.c && ./load trylib -l%(base)s ) >/dev/null 2>&1 \
+  && echo -l%(base)s || exit 0 ) >%(base)s.lib
+rm -f trylib.o trylib

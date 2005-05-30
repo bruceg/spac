@@ -1,0 +1,2 @@
+: clean AUTOFILES
+rm -f `cat AUTOFILES`

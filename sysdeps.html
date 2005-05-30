@@ -1,0 +1,103 @@
+<html>
+
+<head>
+<title>spac: Simple Package Configuration</title>
+<meta name="kewords" content="package configuration autoconf
+automake">
+</head>
+
+<body>
+
+<p><a href="spac.html">spac</a></p>
+
+<h1>System Dependancies</h1>
+
+<hr>
+
+<p>The following (operating) system dependancies are available:<ul>
+
+<li>Availability of a system library: To link against a system
+library, named <tt>X</tt> that may be present only on some systems,
+include <tt>X.lib</tt> in the executable list file.  The following
+uses are known:<ul>
+
+<li><tt>crypt.lib</tt> Use this if you use the <tt>crypt</tt> function
+call, which is found in <tt>-lcrypt</tt> on some systems.
+
+<li><tt>s.lib</tt> Use this if you use ???
+
+<li><tt>shadow.lib</tt> Use this if you are using shadow password
+functions.
+
+</ul>
+
+<li>Availability of linking against <tt>-lsocket -lnsl</tt>: This
+is a special case of the above rule, and tests for linking against
+both libraries simultaneously.  Add <tt>socket.lib</tt> to the
+executable list file if you use sockets.
+
+<li><tt>struct direct</tt> vs <tt>struct dirent</tt>: Include
+<tt>"direntry.h"</tt> to your C source, and use the struct named
+<tt>direntry</tt> in place of the above two structs.
+
+<li><tt>fork</tt> and <tt>vfork</tt>: If you use vfork, add the
+include file <tt>fork.h</tt> to your C source.
+
+<li><tt>hasdevtcp.h</tt>: Unknown.
+
+<li><tt>flock</tt>: Include <tt>"hasflock.h"</tt> which will define
+<tt>HASFLOCK</tt> if the <tt>flock</tt> system call is available.
+
+<li><tt>sigaction</tt> system call: Include <tt>"hassgact.h"</tt>
+which will define <tt>HASSIGACTION</tt> if the <tt>sigaction</tt>
+system call is available.
+
+<li><tt>sigprocmask</tt>, and <tt>sigsuspend</tt>: Include
+<tt>"hassgprm.h"</tt> which will define <tt>HASSIGPROCMASK</tt> if the
+system calls are available.
+
+<li><tt>setgroups</tt> uses an array: Include <tt>"hasshsgr.h"</tt>
+which will define <tt>HASSHORTSETGROUPS</tt> if the <tt>setgroups</tt>
+system call needs to be passed an array of <tt>short</tt> integers
+instead of just integers.
+
+<li>Shadow passwords: Include <tt>"hasspnam.h"</tt> which will define
+<tt>HASGETSPNAM</tt> if the shadow password functions
+(<tt>getspnam</tt> in particular) are available.
+
+<li><tt>getuserpw</tt>: Include <tt>"hasuserpw.h"</tt> which will
+define <tt>HASUSERPW</tt> if the <tt>getuserpw</tt> routine is to be
+used to access authentication information.  This function returns a
+<tt>struct userpw</tt>, with the relevant encrypted password field
+named <tt>upw_passwd</tt>
+
+<li><tt>waitpid</tt> system call: Include <tt>"haswaitp.h"</tt> which
+will define <tt>HASWAITPID</tt> if the <tt>waitpid</tt> system call is
+available.  If it is not available, you will have to revert to using
+the older <tt>wait</tt> system call.
+
+<li><tt>poll</tt> vs <tt>select</tt>: Include <tt>"iopoll.h"</tt>, and
+use the type <tt>iopoll_fd</tt> in place of <tt>struct pollfd</tt>,
+and the function <tt>iopoll</tt> in place of <tt>poll</tt>.  Your
+executables also need to link in <tt>iopoll.o</tt>.
+
+<li><tt>select</tt> system call: Include <tt>"select.h"</tt> which
+provides the necessary includes and declarations to use the
+<tt>select</tt> system call.
+
+<li>Unsigned 32-bit integers: Include <tt>"uint32.h"</tt> and use the
+<tt>uint32</tt> data type.
+
+<li>Unsigned 64-bit integers: Include <tt>"uint64.h"</tt> and use the
+<tt>uint64</tt> data type.
+
+<li><tt>&lt;sys/time.h&gt; and &lt;time.h&gt;</tt>: Include
+<tt>"systime.h"</tt>.
+
+<li><tt>setenv</tt>: Include <tt>"hassetenv.h"</tt>, and link
+<tt>setenv.o</tt> in your executables.
+
+<li><tt>SO_PEERCRED</tt> and <tt>struct ucred</tt>: Include
+<tt>"haspeercred.h"</tt> which will define <tt>HASPEERCRED</tt>.
+
+</ul>

@@ -1,0 +1,3 @@
+: warn-auto.sh choose.sh
+cat warn-auto.sh choose.sh >choose
+chmod 755 choose

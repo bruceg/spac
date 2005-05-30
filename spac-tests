@@ -1,0 +1,271 @@
+#!/usr/bin/python2
+import os
+import re
+import string
+import sys
+
+def fatal(str):
+	sys.stderr.write('make-tests: fatal: ')
+	sys.stderr.write(str)
+	sys.stderr.write('\n')
+	sys.stderr.flush()
+	sys.exit(1)
+
+rx_ws = re.compile(r'\s+')
+def split(str):
+	pos = 0
+	list = [ ]
+	while pos < len(str):
+		if str[pos] == ' ':
+			pos = pos + 1
+		elif str[pos] == "'" or str[pos] == '"':
+			end = string.find(str, str[pos], pos+1)
+			if end == -1:
+				fatal("Terminating quote not found in '%s'" % str)
+			list.append(str[pos+1:end])
+			pos = end + 1
+		else:
+			end = string.find(str, ' ', pos)
+			if end == -1: end = len(str)
+			list.append(str[pos:end])
+			pos = end + 1
+	return list
+
+def join(list):
+	return string.join(map(lambda l:"'%s'"%l, list), ' ')
+
+def permuter(lists):
+	if len(lists) == 0: return [[]]
+	if len(lists) == 1: return map(lambda i:(i,), lists[0])
+	result = [ ]
+	sublist = permuter(lists[1:])
+	for item in lists[0]:
+		for tmp in map(list, sublist):
+			tmp.insert(0, item)
+			result.append(tmp)
+	return result
+
+def permute(lists):
+	return map(tuple, permuter(lists))
+
+class Test:
+	def __init__(self, name, test, loops, res, req, ast, ret):
+		self.name = name
+		self.test = test
+		self.loops = loops
+		self.loop_vars = tuple(map(lambda l:l[0], loops))
+		self.loop_vals = tuple(map(lambda l:l[1], loops))
+		self.loop_perm = permute(self.loop_vals)
+		self.results = res
+		self.requires = req
+		self.asserts = ast
+		self.retracts = ret
+
+	def __repr__(self):
+		return "Test(%s)" % `self.name`
+
+	def script(self):
+		s = [ '', '##### Test %s #####'%self.name, '', 'runtest() {' ]
+		i = 1
+		for var in self.loop_vars:
+			s.append('local %s="$%i"' % (var, i))
+			i = i + 1
+		s.append(string.rstrip(self.test))
+		s.append('}')
+		for result in self.loop_perm:
+			s.append("run_compare_test %s %s <<END_OF_TEST_RESULTS" % (
+				self.name, join(result)))
+			res = string.rstrip(self.results[result])
+			if res: s.append(res)
+			s.append('END_OF_TEST_RESULTS')
+			s.append('')
+		return string.join(s, '\n')
+
+def rangevals(lists):
+	return apply(map, (None,)+tuple(lists))
+	print lists
+
+rx_comment_start = re.compile(r'<!')
+rx_comment_end = re.compile(r'>\s*($|)')
+rx_meta = re.compile(r'^<(\S+)[ \t]*(.*)>[ \t]*-*[ \t]*$', re.MULTILINE)
+def parse_test(name):
+	file = open(name).read()
+	req = [ ]
+	ast = None
+	ret = None
+	loops = [ ]
+	results = { }
+	test = None
+
+	# Strip comments
+	while 1:
+		start = rx_comment_start.search(file)
+		if not start: break
+		end = rx_comment_end.search(file, start.end())
+		if not end: fatal("Unterminated comment in %s" % name)
+		file = file[:start.start()] + file[end.end():]
+
+	start = 0
+	result = None
+	while 1:
+		match = rx_meta.search(file, start)
+		if not match: break
+		(field,value) = match.groups()
+		field = string.lower(field)
+		value = split(value)
+		if field == 'asserts':
+			(ast,) = value
+		elif field == 'retracts':
+			(ret,) = value
+		elif field == 'requires':
+			req.extend(value)
+		elif field == 'loop':
+			loops.append((value[0], tuple(value[1:])))
+		elif field == 'result':
+			part = file[start:match.start()]
+			if not result:
+				test = part
+			else:
+				results[result] = part
+			value = tuple(value)
+			if results.has_key(value):
+				fatal("Result %s defined twice in %s" % (value, name))
+			result = value
+		else:
+			fatal("Invalid field '%s' in %s" % (field, name))
+		start = match.end() + 1
+	if result is None: fatal("No results in %s?!?" % name)
+	results[result] = file[start:]
+	if ast and req:
+		fatal("Cannot both assert and require in same test (%s)" % name)
+	if ast and ret:
+		fatal("Cannot both assert and retract in same test (%s)" % name)
+	if req and ret:
+		fatal("Cannot both require and retract in same test (%s)" % name)
+	for result in permute(map(lambda x:x[1], loops)):
+		if not results.has_key(result):
+			fatal("Result %s not defined in %s" % (result, name))
+	return Test(name, test, loops, results, req, ast, ret)
+
+def readrec(dir, parser):
+	result = [ ]
+	for entry in os.listdir(dir):
+		if entry[0] == '.' or \
+		   entry == 'CVS' or \
+		   entry[-1] == '~':
+			continue
+		path = os.path.join(dir, entry)
+		if os.path.isdir(path):
+			result.extend(readrec(path, parser))
+		else:
+			result.append(parser(path))
+	return result
+
+tests = readrec('tests', parse_test)
+
+requires = { None: [] }
+asserts = { None: None }
+retracts = { None: None }
+for test in tests:
+	if not test.requires:
+		requires[None].append(test)
+	else:
+		for req in test.requires:
+			try: requires[req].append(test)
+			except: requires[req] = [test]
+	if test.asserts:
+		a = test.asserts
+		if asserts.has_key(a):
+			fatal("Assertion %s is raised by both %s and %s" % (
+				a, asserts[a].name, test.name ))
+		asserts[a] = test
+	if test.retracts:
+		r = test.retracts
+		try: retracts[r].append(test)
+		except: retracts[r] = [test]
+
+for r in requires.keys():
+	if not asserts.has_key(r):
+		fatal("Requirement %s never asserted" % r)
+
+for a in asserts.keys():
+	if not retracts.has_key(a):
+		fatal("Assertion %s never retracted" % a)
+
+for r in retracts.keys():
+	if not asserts.has_key(r):
+		fatal("Assertion %s never raised" % r)
+
+schedule = [ ]
+
+for req in requires[None]:
+	if not req.asserts and not req.retracts:
+		schedule.append(req)
+del requires[None]
+del asserts[None]
+del retracts[None]
+
+# How to do multi-level trees here?
+for (condition, reqs) in requires.items():
+	schedule.append(asserts[condition])
+	schedule.extend(reqs)
+	ret = retracts[condition][0]
+	schedule.append(ret)
+	retracts[condition].remove(ret)
+
+for (condition,rets) in retracts.items():
+	for ret in rets:
+		schedule.append(asserts[condition])
+		schedule.append(ret)
+
+out = open('tests.sh', 'w')
+out.write('''#!/bin/sh
+src=`pwd`
+tmp=$src/tests-tmp
+rm -rf $tmp
+mkdir -p $tmp
+PATH="$src:/bin:/usr/bin:/usr/local/bin"
+tests_failed=0
+tests_count=0
+_UID=`id -u`
+_GID=`id -g`
+''')
+
+if os.path.exists('tests.inc'):
+	out.write(open('tests.inc').read())
+
+out.write('''
+run_compare_test() {
+  local name=$1
+  shift
+  sed -e "s:@SOURCE@:$src:g" \
+  	-e "s:@TMPDIR@:$tmp:g" \
+  	-e "s:@UID@:$_UID:" \
+	-e "s:@GID@:$_GID:" \
+	>$tmp/expected
+  ( runtest "$@" 2>&1 ) 2>&1 >$tmp/actual-raw
+  cat -v $tmp/actual-raw >$tmp/actual
+  if ! cmp $tmp/expected $tmp/actual >/dev/null 2>&1
+  then
+    echo "Test $name $@ failed:"
+	( cd $tmp; diff -U 9999 expected actual | tail -n +3; echo; )
+	let tests_failed=tests_failed+1
+  fi
+  rm -f $tmp/expected $tmp/actual
+  let tests_count=tests_count+1
+}
+''')
+
+for test in schedule:
+	out.write(test.script())
+	out.write('\n')
+
+out.write('''
+rm -rf $tmp
+echo $tests_count tests executed, $tests_failed failures
+if [ $tests_failed != 0 ]; then exit 1; fi
+''')
+out.close()
+if os.system('sh tests.sh') != 0:
+	print 'Tests failed!'
+	sys.exit(1)

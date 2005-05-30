@@ -1,0 +1,1 @@
+dependon([ fn[:-2]+'.a' for fn in glob('*=l')])

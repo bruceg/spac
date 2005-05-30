@@ -1,0 +1,23 @@
+readlist(target+'=py', dir)
+dependon(['python-head.py', target+'.py'])
+rx_import1 = re.compile('^import (\S+)$')
+rx_import2 = re.compile('^from (\S+) import')
+def recurse_imports(module):
+	filename = module + '.py'
+	try: file = open(filename)
+	except: return ( )
+	imports = { module: 1 }
+	file = map(string.strip, file.readlines())
+	list1 = filter(None, map(rx_import1.match, file))
+	list2 = filter(None, map(rx_import2.match, file))
+	for match in list1+list2:
+		for name in recurse_imports(match.group(1)):
+			imports[name] = 1
+	return imports.keys()
+modules = recurse_imports(target)
+modules.remove(target)
+modules = map(lambda module:module+'.pyc', modules)
+dependon(modules)
+:
+cat python-head.py %(target)s.py >%(target)s
+chmod 755 %(target)s

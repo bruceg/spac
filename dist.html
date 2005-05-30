@@ -1,0 +1,73 @@
+<html>
+
+<head>
+<title>spac: Simple Package Configuration</title>
+<meta name="kewords" content="package configuration autoconf
+automake">
+</head>
+
+<body>
+
+<p><a href="spac.html">spac</a></p>
+
+<h1>dist: Rules describing distributable packages</h1>
+
+<hr>
+
+<p>Each file in the <tt><a href="dist/">dist</a></tt> directory
+describes a file or set of files to add to a distributable package.
+The content of the file is straight Python script code.  Each of the
+files is loaded and executed, and at the end of the run, a tar archive
+is produced and compressed with gzip.</p>
+
+<p>Before running, the first line from the file <tt>VERSION</tt> is
+read in.  This line must contain the package name, a space, and the
+version number.  The resulting archive will be named
+<tt>PACKAGE-VERSION.tar.gz</tt>.</p>
+
+<p>The following objects are defined for use in the Python code.  All
+variables may be modified, and additional ones may be created.
+<table border=1>
+
+<tr> <th>Name</th> <th>Type</th> <th>Description</th></tr>
+
+<tr> <td>file(name[, content])</td> <td>Function</td> <td>Adds the
+named file to the list of files to copy into the package.  If
+<tt>content</tt> is included, it is written to the resulting file,
+otherwise the named file is copied from the source directory.  If the
+named file has already been named, the program aborts.</td>
+</tr>
+
+<tr> <td>files(list)</td> <td>Function</td> <td>Adds the list of files
+to be copied into the package.</td> </tr>
+
+<tr> <td>glob(pattern)</td> <td>Function</td> <td>Returns a list of
+files matching the given pattern</td> </tr>
+
+<tr> <td>nofile(name)</td> <td>Function</td> <td>Removes the named
+file from the package file list.  No error occurrs if the file was not
+already in the list.</td> </tr>
+
+<tr> <td>nofiles(name)</td> <td>Function</td> <td>Removes the list of
+names from the package file list.</td> </tr>
+
+<tr> <td>os</td> <td>Module</td> <td>Standard OS module</td> </tr>
+
+<tr> <td>package</td> <td>Variable</td> <td>The package name read from
+the <tt>VERSION</tt> file.  Setting this has no effect on the
+resulting package.</td> </tr>
+
+<tr> <td>re</td> <td>Module</td> <td>Standard regular expression
+module</td> </tr>
+
+<tr> <td>readlist(filename)</td> <td>Function</td> <td>Opens the file,
+reads its contents as a list of lines, and strips off all the trailing
+newlines and whitespace.</td> </tr>
+
+<tr> <td>string</td> <td>Module</td> <td>Standard string module</td> </tr>
+
+<tr> <td>version</td> <td>Variable</td> <td>The version number read
+from the <tt>VERSION</tt> file.  Setting this has no effect on the
+resulting package.</td> </tr>
+
+</table></p>

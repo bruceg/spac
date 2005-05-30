@@ -1,0 +1,3 @@
+#if os.path.isdir('tests') and os.path.exists('tests.inc') and os.path.exists('tests.sh'):
+#	command('sh tests.sh')
+: libraries programs docs

@@ -1,0 +1,119 @@
+<html>
+
+<head>
+<title>spac: Simple Package Configuration</title>
+<meta name="kewords" content="package configuration autoconf
+automake">
+</head>
+
+<body>
+
+<h1>spac: Simple Package Configuration</h1>
+
+<h2>Other Tools:</h2>
+
+<p><a href="dist.html">spac-dist</a>: Build distributable
+packages</p>
+
+<h2>Files:</h2>
+
+<p><a href="dist.html">dist</a>: Rules describing distributable
+packages<br>
+
+<a href="files.html">files</a>: Automatically installed files<br>
+
+<a href="rules.html">rules</a>: Rules describing building targets</p>
+
+<h2>Notes:</h2>
+
+<p><a href="sysdeps.html">System Dependancies</a></p>
+
+<hr>
+
+<p>Jiffy Howto:<ol>
+
+<li>Identify all the executables you want to build.</li>
+
+<li>For each executable, create a file named <tt>BASE=x</tt>, where
+<tt>BASE</tt> is the name of the executable. This will instruct
+spac to translate <tt>BASE.o</tt> into an executable by linking it
+with all the other object files and libraries in the created
+file.</li>
+
+<li>Identify all the libraries used by the above step.</li>
+
+<li>For each library, create a file named <tt>BASE=l</tt>, where the
+library is named <tt>BASE.a</tt>, which lists all the object files
+required by that library.</li>
+
+<li>Dependancy files for the object files will be automatically
+created internally by spac.</li>
+
+<li>Dependancies for object targets and system-dependant header files
+will be automatically created.</li>
+
+</ol></p>
+
+<p>Processing:<ol>
+
+<li>Starts by examining the "all" rule.  This rule will produce a list
+of top-level targets.
+
+<li>The rules are examined to satisfy the top-level targets, which
+produces more dependancies.
+
+<li>The remaining dependancies are recursivly satisfied until no
+dependancies remain.
+
+<li>If any dependancies could not be satisfied, the program exits.
+
+<li>All the targets are sorted into a Makefile.
+
+<li>A list of all the files that will be generated during the build
+process is written into <tt>TARGETS</tt>.
+
+<li>A list of all source files used to produce the above targets is
+written into <tt>SRCFILES</tt>.
+
+<li>A list of all the files that were automatically generated is
+written into <tt>AUTOFILES</tt>.
+
+</ol></p>
+
+<p>Special targets and files:</p>
+
+<p>See the documentation on <a href="files.html">files</a> and <a
+href="rules.html">rules</a> for more information.</p>
+
+<p>Compatibility notes:<ul>
+
+<li>The BASE=x, BASE=l, FILES, and TARGETS file names were taken from
+evidence in the distributed ezmlm-0.53.tar.gz source package.</li>
+
+<li>Many of the system dependancy tests have been lifted either as-is
+or with minor modifications from ezmlm, checkpassword, and other DJB
+packages.</li>
+</ul><p>
+
+<p>To Do:<ul>
+
+<li>Does not handle documentation in any form. It should be made to
+handle man pages, HTML documents, plain text files, and a set of
+pre-named files including (but not limited to) AUTHORS, NEWS, README,
+THANKS, TODO, and VERSION.</li>
+
+<li>Does not handle directories.  Targets within directories (ie
+libraries) should produce both additional targets within the top-level
+Makefile so that they can be built without recursion, as well as a
+Makefile within the directories so they can be built seperately.</li>
+
+<li>Does not handle shell scripts.</li>
+
+<li>Needs to write out another file containing a list of all the
+dependancy list files used by the package, to aid with source code
+management.</li>
+
+</ul></p>
+
+</body>
+</html>

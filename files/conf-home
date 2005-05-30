@@ -1,0 +1,4 @@
+/usr/local
+
+The home directory for the installed programs.  Binaries will be
+installed in .../bin, and man pages in .../man.
