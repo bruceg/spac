@@ -27,6 +27,7 @@ class Rule:
 		dependancies = []
 		makecmds = []
 		basename = os.path.basename(target)
+		stem = basename[self.stemstart:self.stemend] or basename
 		globls = {
 			'dependon': dependancies.extend,
 			'command': makecmds.append,
@@ -34,7 +35,8 @@ class Rule:
 			'base': base,
 			'dir': dirname,
 			'files': files,
-			'stem': basename[self.stemstart:self.stemend] or basename,
+			'basename': basename,
+			'stem': stem,
 			'rules': __import__('rules'),
 			}
 		stdexec.stdexec(self.commands, globls)
@@ -79,7 +81,7 @@ def _add_rule(fullpath, entry):
 	rule = _load_rule(fullpath)
 	try:
 		i = entry.index('%')
-		patterns[(i,entry[:i],entry[i+1:])] = rule
+		patterns[(entry[:i],entry[i+1:])] = rule
 	except ValueError:
 		if entry[:8] == 'default=':
 			executables.append(rule)
@@ -111,8 +113,9 @@ def match(target):
 	if targets.has_key(target):
 		rules.append(targets[target])
 	for key,rule in patterns.items():
-		index,prestem,poststem = key
-		if target[:index] == prestem and target[index+1:] == poststem:
+		prestem,poststem = key
+		if target[:len(prestem)] == prestem \
+			   and target[-len(poststem):] == poststem:
 			rules.append(rule)
 	rules.extend(executables)
 	for rule in rules:
