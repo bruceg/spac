@@ -222,9 +222,8 @@ system('make -C %s/websites/%s' % (HOME, WEBSITE))
 
 ###############################################################################
 # Send out an announcement to mailing lists.
-#system("signed-mailsubj 'Announcing %s version %s' %s < ANNOUNCEMENT" % (
-#	PACKAGE, VERSION, string.join(LISTS, ' ')))
-system("mutt -s 'Announcing %s version %s' -i ANNOUNCEMENT %s" % (
+#system("mutt -s 'Announcing %s version %s' -i ANNOUNCEMENT %s" % (
+system("signed-mailsubj 'Announcing %s version %s' %s < ANNOUNCEMENT" % (
 	PACKAGE, VERSION, string.join(LISTS, ' ')))
 
 ###############################################################################
