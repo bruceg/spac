@@ -1,3 +1,3 @@
-: load insthier.o conf_prefix.o
+: load insthier.o
 ./load insthier -lbg-instcheck -lbg
 mv insthier instcheck
