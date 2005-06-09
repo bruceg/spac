@@ -12,6 +12,7 @@ REDHATDIR = os.path.join(HOME, 'redhat')
 WEBSITES = os.path.join(HOME, 'websites')
 BUILDS = ('rh6', 'rh7', 'fc1', 'fc2')
 CWD = os.getcwd()
+POSTINSTALL = ''
 
 ###############################################################################
 # Common functions
@@ -244,3 +245,5 @@ for file in rpmfiles:
 if dorpm and not noarch:
 	for build in BUILDS:
 		os.rmdir(build)
+
+os.system(POSTINSTALL)
