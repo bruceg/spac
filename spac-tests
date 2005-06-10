@@ -249,10 +249,10 @@ run_compare_test() {
   then
     echo "Test $name $@ failed:"
 	( cd $tmp; diff -U 9999 expected actual | tail -n +3; echo; )
-	let tests_failed=tests_failed+1
+	tests_failed=$(($tests_failed+1))
   fi
   rm -f $tmp/expected $tmp/actual
-  let tests_count=tests_count+1
+  tests_count=$(($tests_count+1))
 }
 ''')
 
