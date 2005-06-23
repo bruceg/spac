@@ -141,6 +141,8 @@ system('spac')
 system('make </dev/null')
 if os.path.exists('tests') and os.path.exists('tests.sh'):
 	system('spac-tests')
+	system('ash tests.sh')
+	system('ksh tests.sh')
 
 ###############################################################################
 # Make the distribution tarball.
