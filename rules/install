@@ -1,3 +1,15 @@
-: installer instcheck
-./installer
-./instcheck
+if os.path.exists('insthier.c'):
+	dependon(['instshow','installer','instcheck'])
+	command('./installer')
+	command('./instcheck')
+
+for list,conf in [
+	('BIN','conf-bin'),
+	('INCLUDE','conf-include'),
+	('LIB','conf-lib'),
+	('MAN','conf-man'),
+	]:
+	if os.path.exists(list):
+		dependon([list,conf])
+		command('bg-installer -v "`head -n 1 %s`" <%s' % (conf, list))
+		command('bg-installer -c "`head -n 1 %s`" <%s' % (conf, list))
