@@ -1,3 +1,5 @@
 for texi in glob('*.texi'):
 	base = texi[:-5]
 	dependon([base+'.info', base+'.html'])
+for man in glob('*.[12345678]'):
+	dependon([man+'.html'])
