@@ -2,3 +2,5 @@ dependon(map(lambda fn:fn[:-2], glob('*=x')))
 dependon(map(lambda fn:fn[:-3], glob('*=sh')))
 dependon(map(lambda fn:fn[:-3], glob('*=pl')))
 dependon(map(lambda fn:fn[:-3], glob('*=py')))
+if os.path.exists('insthier.c'):
+	dependon(['installer','instcheck','instshow'])
