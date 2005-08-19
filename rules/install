@@ -2,14 +2,23 @@ if os.path.exists('insthier.c'):
 	dependon(['instshow','installer','instcheck'])
 	command('./installer')
 	command('./instcheck')
-
-for list,conf in [
-	('BIN','conf-bin'),
-	('INCLUDE','conf-include'),
-	('LIB','conf-lib'),
-	('MAN','conf-man'),
-	]:
-	if os.path.exists(list):
-		dependon([list,conf])
-		command('bg-installer -v "`head -n 1 %s`" <%s' % (conf, list))
-		command('bg-installer -c "`head -n 1 %s`" <%s' % (conf, list))
+elif os.path.exists('INSTHIER'):
+	dependon(['INSTHIER'])
+	dependon([ 'conf-%s' % line[1:].strip()
+		for line in open('INSTHIER').readlines()
+		if line[0] == '>' ])
+	command('bg-installer -v <INSTHIER')
+	command('bg-installer -c <INSTHIER')
+else:
+	for list,conf in [
+		('BIN','conf-bin'),
+		('INCLUDE','conf-include'),
+		('LIB','conf-lib'),
+		('MAN','conf-man'),
+		]:
+		if os.path.exists(list):
+			dependon([list,conf])
+			command('bg-installer -v "`head -n 1 %s`" <%s' % (
+				conf, list))
+			command('bg-installer -c "`head -n 1 %s`" <%s' % (
+				conf, list))
