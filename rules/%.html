@@ -1,7 +1,7 @@
 if os.path.exists(base+'.texi'):
 	dependon([base+'.texi'])
-	command('texi2html --toc-file=%(base)s.html --top-file=%(base)s.html %(base)s.texi')
-if base[-2] == '.' and base[-1] in '12345678':
+	command('texi2html --toc-file=%(base)s.html --top-file=%(base)s.html %(base)s.texi' % locals())
+elif base[-2] == '.' and base[-1] in '12345678':
 	dependon([base])
 	command('man2html %(base)s >%(base)s.html' % locals())
 else:
