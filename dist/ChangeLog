@@ -4,6 +4,10 @@ try:
 	line = open('ChangeLog').readline()
 	file('ChangeLog')
 	if re.match(r'^-+\s*$', line):
-		os.system('svn log --verbose -r HEAD:1 >ChangeLog')
+		entries = open('.svn/entries').read()
+		url = re.search('url="([^"]+)"', entries).group(1)
+		if url[-6:] == '/trunk':
+			url = url[:-6]
+		os.system('svn log --verbose -r HEAD:1 %s >ChangeLog' % url)
 except IOError:
 	pass
