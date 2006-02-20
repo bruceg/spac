@@ -1,0 +1,3 @@
+for base in glob('*.cli'):
+	base = base[:-4]
+	files([base+'-cli.c', base+'-cli.h', base+'.1'])
