@@ -1,4 +1,5 @@
 sources = readlist(target+'=x')
+
 def sourcepath(object, dir=dir):
 	if object[-4:] == '.lib':
 		return object
@@ -7,13 +8,23 @@ def sourcepath(object, dir=dir):
 	except ValueError:
 		return os.path.join(dir, object)
 	return object
+
 prefixes = [ '-', '.' ]
-options = string.join([s for s in sources if s[0] in prefixes], ' ')
-sources = map(sourcepath, [s for s in sources if s[0] not in prefixes])
+options = [s for s in sources if s[0] in prefixes]
+sources = [s for s in sources if s[0] not in prefixes]
+sources = map(sourcepath, sources)
+
+if os.path.exists(target+'.cli'):
+	sources.append(target + '-cli.o')
+	options.insert(0, '-lbg-cli')
+
 dependon(sources)
 dotlibs = ["`cat %s`"%s for s in sources if s[-4:] == '.lib']
 sources = [s for s in sources if s[-4:] <> '.lib']
+
 sources = ' '.join(sources)
 dotlibs = ' '.join(dotlibs)
+options = ' '.join(options)
+
 : load %(target)s.o
 ./load %(target)s %(sources)s %(options)s %(dotlibs)s
