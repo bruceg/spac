@@ -1,0 +1,3 @@
+dependon(readlist(base + '=l', dir))
+: makelib
+./makelib %(target)s %(deplist_pre)s
