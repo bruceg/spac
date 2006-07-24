@@ -3,6 +3,6 @@ for texi in glob('*.texi'):
 	dependon([base+'.info', base+'.html'])
 for cli in glob('*.cli'):
 	base = cli[:-4]
-	dependon([ base+'.1' ])
+	dependon([ base+'.1', base+'.1.html' ])
 for man in glob('*.[12345678]'):
 	dependon([man+'.html'])
