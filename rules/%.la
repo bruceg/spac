@@ -1,0 +1,5 @@
+objs = readlist(base + '=l', dir)
+dependon([ (obj[-2:] == '.o') and obj[:-2]+'.lo' or obj
+	for obj in objs ])
+: makeshlib
+./makeshlib %(target)s %(deplist_pre)s
