@@ -1,0 +1,16 @@
+cmd_extra = ''
+inc_extra = ''
+if not os.path.exists('no-bglibs'):
+	dependon(['conf-bgincs', 'conf-bglibs'])
+	cmd_extra = 'bgincs=`head -n 1 conf-bgincs`; \\\n' \
+		+ '\t  bglibs=`head -n 1 conf-bglibs`;'
+	inc_extra = '"-I\'$${bgincs}\'"'
+	lib_extra = '"-L\'$${bglibs}\'"'
+: conf-ccso conf-ld
+( %(cmd_extra)s \
+  echo '#!/bin/sh'; \
+  echo 'source=$$1; shift'; \
+  echo 'base=`echo "$$source" | sed -e s:\\\\.c$$::`'; \
+  echo exec `head -n 1 conf-ccso` -DSHARED -I. %(inc_extra)s -L. %(lib_extra)s '-o $${base}.so $$source $${1+"$$@"}'; \
+) >makeso
+chmod 755 makeso
