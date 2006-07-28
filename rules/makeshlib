@@ -1,7 +1,8 @@
 : conf-ld conf-lib LIBVERSION Makefile
-( echo '#!/bin/sh'; \
+( if libtool --tag=CC --help >/dev/null 2>&1; then tag='--tag=CC'; fi; \
+  echo '#!/bin/sh'; \
   echo 'lib="$$1"; shift';\
   echo 'rm -f "$$lib"';\
-  echo 'libtool --mode=link --silent --tag=CC' `head -n 1 conf-ld` '-o "$$lib" -rpath' `head -n 1 conf-lib` -version-info `head -n 1 LIBVERSION` '$${1+"$$@"}';\
+  echo libtool --mode=link --silent $$tag `head -n 1 conf-ld` '-o "$$lib" -rpath' `head -n 1 conf-lib` -version-info `head -n 1 LIBVERSION` '$${1+"$$@"}';\
 ) >makeshlib
 chmod 755 makeshlib
