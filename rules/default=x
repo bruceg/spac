@@ -1,5 +1,12 @@
 sources = readlist(target+'=x')
 
+loader = 'load'
+for s in sources:
+	if s[-3:] == '.la' or s[-3:] == '.lo':
+		loader = 'ltload'
+		break
+dependon([loader])
+
 def sourcepath(object, dir=dir):
 	if object[-4:] == '.lib':
 		return object
@@ -26,5 +33,5 @@ sources = ' '.join(sources)
 dotlibs = ' '.join(dotlibs)
 options = ' '.join(options)
 
-: load %(target)s.o
-./load %(target)s %(sources)s %(options)s %(dotlibs)s
+: %(target)s.o
+./%(loader)s %(target)s %(sources)s %(options)s %(dotlibs)s
