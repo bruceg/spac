@@ -4,7 +4,7 @@ libs = ''
 if not os.path.exists('no-bglibs'):
 	dependon(['conf-bglibs'])
 	cmd_extra = 'bglibs=`head -n 1 conf-bglibs`;'
-	lib_extra = '"-L\'$${bglibs}\'"'
+	lib_extra = '"-L\'$${bglibs}\'" "-Wl,-R\'$${bglibs}\'"'
 	libs = '-lbg-sysdeps'
 : conf-ld
 ( %(cmd_extra)s \
