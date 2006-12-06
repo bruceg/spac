@@ -73,6 +73,22 @@ def scan_cpp(filename):
 		match = rx_include.search(file, match.end())
 	return list
 
+def scan_libs(filename):
+	sources = readlist(filename)
+	def sourcepath(object, dir=dir):
+		if object[-4:] == '.lib' \
+			   or object.find('/') >= 0:
+			return object
+		return os.path.join
+	options = [ s for s in sources if s[0] == '-' or s[0] == '.' ]
+	for option in options:
+		sources.remove(option)
+	sources = [ sourcepath(s) for s in sources ]
+	dotlibs = [ "`cat %s`" % s for s in sources if s[-4:] == '.lib' ]
+	sources = [ s for s in sources if s[-4:] <> '.lib' ]
+
+	return sources, ' '.join(sources), ' '.join(options), ' '.join(dotlibs)
+
 std_globals = {
 	'fail': fail,
 	'glob': glob.glob,
@@ -82,6 +98,7 @@ std_globals = {
 	'readlist': readlist,
 	'read': read,
 	'scan_cpp': scan_cpp,
+	'scan_libs': scan_libs,
 	'string': string,
 	'time': time,
 	}

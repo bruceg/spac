@@ -1,10 +1,8 @@
-extras = readlist(base+'=so')
-prefixes = [ '-', '.' ]
-dependon([ s for s in extras
-	if s[0] not in prefixes ])
-extras = ' '.join(extras)
-
 source = base + '.c'
 dependon(scan_cpp(source) or [source])
+
+sources,sourcestr,optionstr,dotlibstr = scan_libs(base + '=so')
+dependon(sources)
+
 : makeso
-./makeso %(base)s.c %(extras)s
+./makeso %(base)s.c %(sourcestr)s %(optionstr)s %(dotlibstr)s

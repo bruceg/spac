@@ -1,4 +1,4 @@
-sources = readlist(target+'=x')
+sources,sourcestr,optionstr,dotlibstr = scan_libs(target + '=x')
 
 loader = 'load'
 for s in sources:
@@ -7,31 +7,11 @@ for s in sources:
 		break
 dependon([loader])
 
-def sourcepath(object, dir=dir):
-	if object[-4:] == '.lib':
-		return object
-	try:
-		object.index('/')
-	except ValueError:
-		return os.path.join(dir, object)
-	return object
-
-prefixes = [ '-', '.' ]
-options = [s for s in sources if s[0] in prefixes]
-sources = [s for s in sources if s[0] not in prefixes]
-sources = map(sourcepath, sources)
-
 if os.path.exists(target+'.cli'):
 	sources.append(target + '-cli.o')
 	options.insert(0, '-lbg-cli')
 
 dependon(sources)
-dotlibs = ["`cat %s`"%s for s in sources if s[-4:] == '.lib']
-sources = [s for s in sources if s[-4:] <> '.lib']
-
-sources = ' '.join(sources)
-dotlibs = ' '.join(dotlibs)
-options = ' '.join(options)
 
 : %(target)s.o
-./%(loader)s %(target)s %(sources)s %(options)s %(dotlibs)s
+./%(loader)s %(target)s %(sourcestr)s %(optionstr)s %(dotlibstr)s
