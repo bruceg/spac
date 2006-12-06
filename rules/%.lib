@@ -1,4 +1,7 @@
-: compile load trylib.c
-( ( ./compile trylib.c && ./load trylib -l%(base)s ) >/dev/null 2>&1 \
-  && echo -l%(base)s || exit 0 ) >%(base)s.lib
-rm -f trylib.o trylib
+: compile load
+@echo -n 'Checking for -l%(base)s: '
+@echo 'main() { ; }' >trylib.c
+@{ ./compile trylib.c && ./load trylib -l%(base)s; } >/dev/null 2>&1 \
+  && { echo -l%(base)s >%(base)s.lib; echo yes; } \
+  || { echo -n >%(base)s.lib; echo no; }
+@rm -f trylib.c trylib.o trylib
