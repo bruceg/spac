@@ -85,9 +85,13 @@ def scan_libs(filename):
 		sources.remove(option)
 	sources = [ sourcepath(s) for s in sources ]
 	dotlibs = [ "`cat %s`" % s for s in sources if s[-4:] == '.lib' ]
-	sources = [ s for s in sources if s[-4:] <> '.lib' ]
 
-	return sources, ' '.join(sources), ' '.join(options), ' '.join(dotlibs)
+	return (
+		sources,
+		' '.join([ s for s in sources if s[-4:] <> '.lib' ]),
+		' '.join(options),
+		' '.join(dotlibs)
+		)
 
 std_globals = {
 	'fail': fail,
