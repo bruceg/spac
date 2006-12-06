@@ -1,2 +1,2 @@
-: %(base)s.py
-python -c '__import__("%(base)s")'
+: compilepy %(base)s.py
+./compilepy %(base)s.py

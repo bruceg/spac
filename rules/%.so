@@ -1,4 +1,8 @@
-extras = ' '.join(readlist(base+'=so'))
+extras = readlist(base+'=so')
+prefixes = [ '-', '.' ]
+dependon([ s for s in extras
+	if s[0] not in prefixes ])
+extras = ' '.join(extras)
 
 rx_include = re.compile(r'^\s*#\s*include\s+([<"])(.+)[">]\s*$', re.MULTILINE)
 def scan_file(filename):

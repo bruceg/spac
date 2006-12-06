@@ -1,2 +1,0 @@
-: %(base)s.py
-python -O -c '__import__("%(base)s")'

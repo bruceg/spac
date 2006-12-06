@@ -1,0 +1,9 @@
+: auto-python
+( \
+  echo '#!/bin/sh'; \
+  echo 'source=$$1; shift'; \
+  echo 'base=`echo "$$source" | sed -e s:\\\\.py$$::`'; \
+  echo 'rm -f "$$base".pyc'; \
+  echo exec `head -n 1 auto-python` "-c \"__import__('\$${base}')\""; \
+) >compilepy
+chmod 755 compilepy
