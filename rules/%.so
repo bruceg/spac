@@ -4,35 +4,7 @@ dependon([ s for s in extras
 	if s[0] not in prefixes ])
 extras = ' '.join(extras)
 
-rx_include = re.compile(r'^\s*#\s*include\s+([<"])(.+)[">]\s*$', re.MULTILINE)
-def scan_file(filename):
-	(dir,foo) = os.path.split(filename)
-	file = read(filename)
-	if file is None: return
-	list = [ filename ]
-	match = rx_include.search(file)
-	while match:
-		inc = match.group(2)
-		if files.copy(inc) or rules.match(inc):
-			list.append(inc)
-		else:
-			incs = scan_file(inc)
-			if incs is None:
-				incs = scan_file(os.path.join(dir, inc))
-				if incs is None:
-					if match.group(1) == '<':
-						incs = [ ]
-					else:
-						incs = [ inc ]
-			list.extend(incs)
-		match = rx_include.search(file, match.end())
-	#print "scan_file(%(filename)s) => %(list)s" % locals()
-	return list
-
 source = base + '.c'
-sources = scan_file(source)
-if sources is None:
-	sources = [ source ]
-dependon(sources)
+dependon(scan_cpp(source) or [source])
 : makeso
 ./makeso %(base)s.c %(extras)s

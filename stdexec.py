@@ -7,6 +7,7 @@ import sys
 import time
 
 import files
+import rules
 
 debug = 0
 
@@ -47,6 +48,31 @@ def fail():
 	print 'Execution failed!'
 	sys.exit(1)
 
+rx_include = re.compile(r'^\s*#\s*include\s+([<"])(.+)[">]\s*$', re.MULTILINE)
+def scan_cpp(filename):
+	path = os.path.split(filename)[0]
+	file = read(filename)
+	if file is None:
+		return
+	list = [ ]
+	match = rx_include.search(file)
+	while match:
+		inc = match.group(2)
+		if files.copy(inc) or rules.match(inc):
+			list.append(inc)
+		else:
+			incs = scan_cpp(inc)
+			if incs is None:
+				incs = scan_cpp(os.path.join(path, inc))
+				if incs is None:
+					if match.group(1) == '<':
+						incs = [ ]
+					else:
+						incs = [ inc ]
+			list.extend(incs)
+		match = rx_include.search(file, match.end())
+	return list
+
 std_globals = {
 	'fail': fail,
 	'glob': glob.glob,
@@ -55,6 +81,7 @@ std_globals = {
 	're': re,
 	'readlist': readlist,
 	'read': read,
+	'scan_cpp': scan_cpp,
 	'string': string,
 	'time': time,
 	}
