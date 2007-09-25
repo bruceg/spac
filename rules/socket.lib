@@ -1,4 +1,6 @@
-: compile load trylib.c
-( ( ./compile trylib.c && ./load trylib -lsocket -lnsl ) >/dev/null 2>&1 \
+: compile load
+@echo -n 'Checking for socket libraries: '
+@echo 'main() { ; }' >trylib.c
+@( ( ./compile trylib.c && ./load trylib -lsocket -lnsl ) >/dev/null 2>&1 \
   && echo -lsocket -lnsl || exit 0 ) >socket.lib
-rm -f trylib.o trylib
+@rm -f trylib.c trylib.o trylib
