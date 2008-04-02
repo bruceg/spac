@@ -1,13 +1,26 @@
+def get_url(entries):
+	if entries[:7] == '8\n\ndir\n':
+		return entries.split('\n')[4]
+	return re.search('url="([^"]+)"', entries).group(1)
+
+def rebuild_git():
+	os.system('git log >ChangeLog')
+
+def rebuild_svn():
+	entries = open('.svn/entries').read()
+	url = get_url(entries)
+	if url[-6:] == '/trunk':
+		url = url[:-6]
+	os.system('svn log --verbose -r HEAD:1 %s >ChangeLog' % url)
+
 # If the ChangeLog exists, add it to the distribution.
-# If it contains a Subversion header, regenerate it.
+# If it contains Subversion or GIT headers, regenerate it.
 try:
 	line = open('ChangeLog').readline()
 	file('ChangeLog')
 	if re.match(r'^-+\s*$', line):
-		entries = open('.svn/entries').read()
-		url = re.search('url="([^"]+)"', entries).group(1)
-		if url[-6:] == '/trunk':
-			url = url[:-6]
-		os.system('svn log --verbose -r HEAD:1 %s >ChangeLog' % url)
+		rebuild_svn()
+	elif re.match(r'^commit [0-9a-f]+$', line) and os.path.isdir('.git'):
+		rebuild_git()
 except IOError:
 	pass
