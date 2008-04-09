@@ -14,7 +14,7 @@ DEFAULT = intern('DEFAULT')
 
 # Global 
 opt_debug = 0
-targets = { }
+ruleset = { }
 missing = [ ]
 srcfiles = [ ]
 autofiles = [ 'Makefile', 'AUTOFILES', 'SRCFILES', 'TARGETS' ]
@@ -51,15 +51,15 @@ class Rule:
 			self.targets, self.dependancies, self.commands)
 
 def target(name, deplist, commands):
-	global targets
-	targets[name] = Rule((name,), deplist, commands)
-	debug("target(%s) = %s" % (name, repr(targets[name])))
+	global ruleset
+	ruleset[name] = Rule((name,), deplist, commands)
+	debug("target(%s) = %s" % (name, repr(ruleset[name])))
 
 def recurse_dep(dep):
 	global autofiles
 	global srcfiles
 	global missing
-	if targets.has_key(dep):
+	if ruleset.has_key(dep):
 		return None
 	if dep in srcfiles or dep in autofiles:
 		return None
@@ -95,7 +95,7 @@ def recurse_deps(deps):
 		if moredeps:
 			recurse_deps(moredeps)
 	
-def make_targets():
+def make_ruleset():
 	( top, commands ) = rules.match(TOP)
 	recurse_deps(top)
 
@@ -103,4 +103,9 @@ def make_targets():
 	if missing:
 		raise SystemExit, "Missing dependancies encountered, aborting."
 
-	return ( targets, srcfiles, autofiles )
+	return (
+		dict([ (rule.targets,rule) for rule in ruleset.values() ]),
+		ruleset.keys(),
+		srcfiles,
+		autofiles
+		)

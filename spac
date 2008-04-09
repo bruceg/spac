@@ -29,9 +29,9 @@ for (option,value) in opts:
 makemake.opt_debug = opt_verbose
 
 rules.load_all()
-( targets, srcfiles, autofiles ) = makemake.make_targets()
+( ruleset, targets, srcfiles, autofiles ) = makemake.make_ruleset()
 
-makefile.write(targets)
-WriteFile('TARGETS').writelist(targets.keys()).close()
+makefile.write(ruleset)
+WriteFile('TARGETS').writelist(targets).close()
 WriteFile('SRCFILES').writelist(srcfiles).close()
 WriteFile('AUTOFILES').writelist(autofiles).close()

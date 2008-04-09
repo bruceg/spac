@@ -16,17 +16,15 @@ DEFAULT: all
 
 """
 
-def write(targets, filename='Makefile'):
-	targets = dict([ (target.targets,target) for target in targets.values() ])
-	names = targets.keys()
+def write(ruleset, filename='Makefile'):
+	names = ruleset.keys()
 	names.sort()
-	print names
 	
 	makefile = WriteFile('Makefile')
 	makefile.write(header)
  	#makefile.write("everything: %s\n\n" % string.join(names, ' '))
 	
 	for name in names:
-		makefile.write(str(targets[name]))
+		makefile.write(str(ruleset[name]))
 		makefile.write('\n')
 	makefile.close()
