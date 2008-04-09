@@ -30,11 +30,21 @@ if start:
 	else:
 		ann = ann + news[start.start():]
 
+try:
+	readme = open('README.in').read()
+except:
+	try:
+		readme = open('README').read()
+	except:
+		readme = ''
+
 today = '%04i-%02i-%02i' % time.localtime(time.time())[:3]
-ann = ann + open('README').read() \
-		.replace('@VERSION@', version) \
-		.replace('@TODAY@', today) \
-		.replace('@PACKAGE@', package)
+year = '%04i' % localtime[0]
+ann += readme \
+	.replace('@VERSION@', version) \
+	.replace('@TODAY@', today) \
+	.replace('@PACKAGE@', package) \
+	.replace('@YEAR@', year)
 
 open('ANNOUNCEMENT', 'w').write(ann)
 file('ANNOUNCEMENT', ann)
