@@ -10,7 +10,7 @@ import sys
 HOME = os.environ['HOME']
 REDHATDIR = os.path.join(HOME, 'redhat')
 WEBSITES = os.path.join(HOME, 'websites')
-BUILDS = ('rh6', 'rh7', 'fc1', 'fc2')
+BUILDS = ('rh6', 'rh7', 'fc2')
 CWD = os.getcwd()
 POSTINSTALL = ''
 
@@ -31,13 +31,16 @@ def copyfile(filename):
 	except OSError: pass
 	return open(dstpath, 'w').write(content)
 
+def forcelink(src, dst):
+	try: os.unlink(dst)
+	except OSError: pass
+	return os.link(src, dst)
+
 def linkfile(filename):
 	global archiverdir
 	dstpath = os.path.join(archiverdir, filename)
 	print "makedist: Linking %s => %s" % (filename, dstpath)
-	try: os.unlink(dstpath)
-	except OSError: pass
-	return os.link(filename, dstpath)
+	return forcelink(filename, dstpath)
 
 def renamerx(srcpath, dstpath, rx):
 	result = [ ]
@@ -118,21 +121,21 @@ noarch = os.system("grep '^BuildArch: noarch$' spec >/dev/null 2>&1") == 0
 ###############################################################################
 # Make sure all changes are committed to the subversion repository before
 # continuing.
-if os.path.exists('CVS') or not os.path.exists('.svn'):
-	print "Please convert this package to subversion before continuing"
-re_svn_url = re.compile(r'^\s*url="(.+)"\s*$')
-svn_url = None
-for line in open('.svn/entries'):
-	m = re_svn_url.match(line)
-	if m:
-		svn_url = m.group(1)
-		break
-if not svn_url:
-	print "Could not determine subversion URL"
-svn_base = svn_url
-if svn_base[-6:] == '/trunk':
-	svn_base = svn_base[:-6]
-system('test `svn diff | wc -c` = 0')
+if os.path.exists('CVS'):
+	print "Please convert this package before continuing"
+if os.path.isdir('.svn'):
+	re_svn_url = re.compile(r'^\s*url="(.+)"\s*$')
+	entries = file('.svn/entries').read()
+	if entries[:7] == '8\n\ndir\n':
+		svn_url = entries.split('\n')[4]
+	else:
+		svn_url = re_svn_url.match(entries).group(1)
+	svn_base = svn_url
+	if svn_base[-6:] == '/trunk':
+		svn_base = svn_base[:-6]
+	system('test $( svn diff | wc -c ) = 0')
+elif os.path.isdir('.git'):
+	system('test $( git diff | wc -c ) = 0')
 
 ###############################################################################
 # Make sure all system dependancies are covered
@@ -212,9 +215,9 @@ raw_input('Press Enter to continue sending the installation to the web site:')
 # Delete the old version from the web site, and copy the release files on.
 if not os.path.isdir(os.path.join(DSTDIR, 'archive')):
 	os.makedirs(os.path.join(DSTDIR, 'archive'), 0755)
-os.link(tar, os.path.join(DSTDIR, 'archive', tar))
-os.link(sig, os.path.join(DSTDIR, 'archive', sig))
-os.link(tar, os.path.join('/usr/portage/distfiles', tar))
+forcelink(tar, os.path.join(DSTDIR, 'archive', tar))
+forcelink(sig, os.path.join(DSTDIR, 'archive', sig))
+forcelink(tar, os.path.join('/usr/portage/distfiles', tar))
 if LAST_VERSION:
 	deltreetrans(os.path.join(archivedir, LAST_VERSION), DSTDIR)
 linktree(archiverdir, DSTDIR)
@@ -226,14 +229,19 @@ system('make -C %s/websites/%s' % (HOME, WEBSITE))
 
 ###############################################################################
 # Send out an announcement to mailing lists.
-#system("mutt -s 'Announcing %s version %s' -i ANNOUNCEMENT %s" % (
-system("signed-mailsubj 'Announcing %s version %s' %s < ANNOUNCEMENT" % (
+#system("signed-mailsubj 'Announcing %s version %s' %s < ANNOUNCEMENT" % (
+system("mutt -s 'Announcing %s version %s' -i ANNOUNCEMENT %s" % (
 	PACKAGE, VERSION, string.join(LISTS, ' ')))
 
 ###############################################################################
 # Tag the package in the subversion with the release number.
-system("svn copy '%s' '%s/tags/%s' -m 'Tagged version %s'" % (
-	svn_url, svn_base, VERSION, VERSION))
+if os.path.isdir('.svn'):
+	system("svn copy '%s' '%s/tags/%s' -m 'Tagged version %s'" % (
+		svn_url, svn_base, VERSION, VERSION))
+if os.path.isdir('.git'):
+	system("git tag -s -m 'Version %s' %s" % (
+		VERSION, VERSION ))
+	system('git push origin master %s' % VERSION)
 
 ###############################################################################
 # Optionally upload the RPMs to FTP sites.
