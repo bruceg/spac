@@ -48,38 +48,44 @@ def fail():
 	print 'Execution failed!'
 	sys.exit(1)
 
-rx_include = re.compile(r'^\s*#\s*include\s+([<"])(.+)[">]\s*$', re.MULTILINE)
-def scan_cpp(filename):
+rx_include = re.compile(r'^\s*#\s*include\s+([<"])([^">]+)[">]\s*$', re.MULTILINE)
+def scan_cpp(filename,already=None):
+	if not already:
+		already = { }
+	if already.has_key(filename):
+		return
+	if files.copy(filename) or rules.match(filename):
+		return [ filename ]
+	already[filename] = None
 	path = os.path.split(filename)[0]
 	file = read(filename)
 	if file is None:
-		return
-	list = [ ]
+		raise IOError
+	deps = [ filename ]
 	match = rx_include.search(file)
 	while match:
-		inc = match.group(2)
-		if files.copy(inc) or rules.match(inc):
-			list.append(inc)
-		else:
-			incs = scan_cpp(inc)
-			if incs is None:
-				incs = scan_cpp(os.path.join(path, inc))
-				if incs is None:
-					if match.group(1) == '<':
-						incs = [ ]
-					else:
-						incs = [ inc ]
-			list.extend(incs)
+		inctype,inc = match.groups()
+		try:
+			incs = scan_cpp(inc, already)
+		except IOError:
+			try:
+				incs = scan_cpp(os.path.join(path, inc), already)
+			except IOError:
+				if inctype == '<':
+					incs = [ ]
+				else:
+					incs = [ inc ]
+		deps.extend(incs or [ ])
 		match = rx_include.search(file, match.end())
-	return list
+	return deps
 
 def scan_libs(filename):
 	sources = readlist(filename)
-	def sourcepath(object, dir=dir):
+	def sourcepath(object, dir=os.path.split(filename)[0]):
 		if object[-4:] == '.lib' \
 			   or object.find('/') >= 0:
 			return object
-		return os.path.join
+		return os.path.join(dir, object)
 	options = [ s for s in sources if s[0] == '-' or s[0] == '.' ]
 	for option in options:
 		sources.remove(option)
