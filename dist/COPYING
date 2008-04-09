@@ -1,1 +1,2 @@
-file('COPYING')
+if os.path.exists('COPYING'):
+	file('COPYING')
