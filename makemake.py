@@ -31,8 +31,9 @@ def debug(*str):
 	if opt_debug:
 		print 'debug:', string.join(str, ' ')
 
-class Target:
-	def __init__(self, dependancies = None, commands = None):
+class Rule:
+	def __init__(self, targets = None, dependancies = None, commands = None):
+		self.targets = targets or [ ]
 		self.dependancies = dependancies or [ ]
 		self.commands = commands or [ ]
 
@@ -41,14 +42,17 @@ class Target:
 		self.add_command = self.commands.append
 		self.add_commands = self.commands.extend
 	def __str__(self):
-		cmds = string.join(map(lambda line:"\t%s\n"%line, self.commands), '')
-		return "%s\n%s" % (string.join(self.dependancies, ' '), cmds)
+		return '%s: %s\n%s' % (
+			' '.join(self.targets),
+			' '.join(self.dependancies),
+			''.join([ '\t%s\n' % line for line in self.commands ]))
 	def __repr__(self):
-		return "Target(%s, %s)" % (self.dependancies, self.commands)
+		return "Rule(%s, %s, %s)" % (
+			self.targets, self.dependancies, self.commands)
 
 def target(name, deplist, commands):
 	global targets
-	targets[name] = Target(deplist, commands)
+	targets[name] = Rule([name], deplist, commands)
 	debug("target(%s) = %s" % (name, repr(targets[name])))
 
 def recurse_dep(dep):

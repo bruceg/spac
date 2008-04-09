@@ -25,5 +25,6 @@ def write(targets, filename='Makefile'):
  	#makefile.write("everything: %s\n\n" % string.join(names, ' '))
 	
 	for name in names:
-		makefile.write("%s: %s\n" % (name, targets[name]))
+		makefile.write(str(targets[name]))
+		makefile.write('\n')
 	makefile.close()
