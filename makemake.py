@@ -33,7 +33,7 @@ def debug(*str):
 
 class Rule:
 	def __init__(self, targets = None, dependancies = None, commands = None):
-		self.targets = targets or [ ]
+		self.targets = tuple(targets) or ( )
 		self.dependancies = dependancies or [ ]
 		self.commands = commands or [ ]
 
@@ -52,7 +52,7 @@ class Rule:
 
 def target(name, deplist, commands):
 	global targets
-	targets[name] = Rule([name], deplist, commands)
+	targets[name] = Rule((name,), deplist, commands)
 	debug("target(%s) = %s" % (name, repr(targets[name])))
 
 def recurse_dep(dep):

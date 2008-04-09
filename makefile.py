@@ -17,8 +17,10 @@ DEFAULT: all
 """
 
 def write(targets, filename='Makefile'):
+	targets = dict([ (target.targets,target) for target in targets.values() ])
 	names = targets.keys()
 	names.sort()
+	print names
 	
 	makefile = WriteFile('Makefile')
 	makefile.write(header)
