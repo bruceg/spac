@@ -30,9 +30,6 @@ if re.search('anonymous CVS', readme, re.IGNORECASE):
 if not re.search('Copyright.*%s'%year, readme, re.IGNORECASE):
 	print "README is missing today's year in the copyright."
 	fail()
-if not re.search('subversion', readme, re.IGNORECASE):
-	print "README is missing Subversion note."
-	fail()
 if re.search('lists\.em\.ca', readme, re.IGNORECASE):
 	print "README contains reference to obsoleted lists.em.ca site."
 	fail()
