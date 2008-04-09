@@ -8,8 +8,9 @@ for s in sources:
 dependon([loader])
 
 if os.path.exists(target+'.cli'):
-	sources.append(target + '-cli.o')
-	options.insert(0, '-lbg-cli')
+	sources.append('%s-cli.o' % target)
+	sourcestr += ' %s' % sources[-1]
+	optionstr = '-lbg-cli ' + optionstr
 
 dependon(sources)
 
