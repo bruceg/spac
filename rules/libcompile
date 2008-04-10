@@ -6,9 +6,10 @@ if not os.path.exists('no-bglibs'):
 	inc_extra = '"-I\'$${bgincs}\'"'
 : conf-cc
 ( %(cmd_extra)s \
+  if libtool --tag=CC --help >/dev/null 2>&1; then tag='--tag=CC'; fi; \
   echo '#!/bin/sh'; \
   echo 'source=$$1; shift'; \
   echo 'base=`echo "$$source" | sed -e s:\\\\.c$$::`'; \
-  echo exec libtool --mode=compile --silent `head -n 1 conf-cc` -I. %(inc_extra)s '-o $${base}.lo -c $$source $${1+"$$@"}'; \
+  echo exec libtool --mode=compile --silent $$tag `head -n 1 conf-cc` -I. %(inc_extra)s '-o $${base}.lo -c $$source $${1+"$$@"}'; \
 ) >libcompile
 chmod 755 libcompile
