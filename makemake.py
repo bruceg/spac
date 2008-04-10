@@ -50,10 +50,12 @@ class Rule:
 		return "Rule(%s, %s, %s)" % (
 			self.targets, self.dependancies, self.commands)
 
-def target(name, deplist, commands):
+def add_rule(targets, deplist, commands):
 	global ruleset
-	ruleset[name] = Rule((name,), deplist, commands)
-	debug("target(%s) = %s" % (name, repr(ruleset[name])))
+	rule = Rule(targets, deplist, commands)
+	for target in targets:
+		ruleset[target] = rule
+	debug(repr(rule))
 
 def recurse_dep(dep):
 	global autofiles
@@ -67,9 +69,9 @@ def recurse_dep(dep):
 	# Is the dependancy matched by a rule?
 	rule = rules.match(dep)
 	if rule:
-		( deplist, commands ) = rule
-		target(dep, deplist, commands)
-		debug("Found '%(dep)s' as rule => %(deplist)s" % locals())
+		( targets, deplist, commands ) = rule
+		add_rule(targets, deplist, commands)
+		debug("Found '%(dep)s' as rule %(targets)s => %(deplist)s" % locals())
 		return deplist
 	# Is the dependancy an automatic file?
 	if files.copy(dep):
@@ -96,7 +98,7 @@ def recurse_deps(deps):
 			recurse_deps(moredeps)
 	
 def make_ruleset():
-	( top, commands ) = rules.match(TOP)
+	( targets, top, commands ) = rules.match(TOP)
 	recurse_deps(top)
 
 	global missing

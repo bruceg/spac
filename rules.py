@@ -26,9 +26,11 @@ class Rule:
 		(dirname, basename) = os.path.split(target)
 		dependancies = []
 		makecmds = []
+		targets = [ target ]
 		basename = os.path.basename(target)
 		stem = basename[self.stemstart:self.stemend] or basename
 		globls = {
+			'addtarget': targets.append,
 			'dependon': dependancies.extend,
 			'command': makecmds.append,
 			'target': target,
@@ -50,7 +52,7 @@ class Rule:
 		if self.makecmds:
 			for makecmd in self.makecmds:
 				makecmds.append(makecmd % globls)
-		return ( dependancies, makecmds )
+		return ( targets, dependancies, makecmds )
 
 targets = { }
 
