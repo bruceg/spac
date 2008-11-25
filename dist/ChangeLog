@@ -4,7 +4,7 @@ def get_url(entries):
 	return re.search('url="([^"]+)"', entries).group(1)
 
 def rebuild_git():
-	os.system('git log >ChangeLog')
+	os.system('git log --stat --summary -C -M >ChangeLog')
 
 def rebuild_svn():
 	entries = open('.svn/entries').read()
