@@ -1,5 +1,5 @@
 def get_url(entries):
-	if entries[:7] == '8\n\ndir\n':
+	if entries[:7] == '8\n\ndir\n' or entries[:7] == '9\n\ndir\n':
 		return entries.split('\n')[4]
 	return re.search('url="([^"]+)"', entries).group(1)
 
