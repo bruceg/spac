@@ -154,9 +154,9 @@ system('spac-dist')
 ###############################################################################
 # Build the RPM sets
 
-# FIXME:
-# Need to write rpm log to file, and grep for "Wrote: ...RPMS/..." lines
-rpmcmd = "cd %(CWD)s && nice rpmbuild -ta --clean %(tar)s" % vars()
+# FIXME: Need to write rpm log to file, and grep for "Wrote: ...RPMS/..." lines
+# FIXME: Drop the hard-coded i386 target?
+rpmcmd = "cd %(CWD)s && nice rpmbuild -ta --clean --target=i386 %(tar)s" % vars()
 rpmfiles = [ ]
 
 dorpm = os.path.exists('spec') and not os.path.exists('spec.dist')
