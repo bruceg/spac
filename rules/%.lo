@@ -1,5 +1,5 @@
 source = base + '.c'
 dependon(scan_cpp(source) or [source])
 addtarget(base + '.o')
-: libcompile
-./libcompile %(base)s.c
+: ltcompile
+./ltcompile %(base)s.c
