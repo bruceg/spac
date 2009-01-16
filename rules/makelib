@@ -1,8 +1,8 @@
 :
 ( echo '#!/bin/sh'; \
-  echo 'main="$$1"; shift';\
-  echo 'rm -f "$$main"';\
-  echo 'ar cr "$$main" $${1+"$$@"}';\
-  echo 'ranlib "$$main"';\
+  echo 'lib="$$1"; shift';\
+  echo 'rm -f "$$lib"';\
+  echo 'ar cr "$$lib" $${1+"$$@"}';\
+  echo 'ranlib "$$lib"';\
 ) >makelib
 chmod 755 makelib
