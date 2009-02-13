@@ -18,8 +18,14 @@ POSTINSTALL = ''
 # Common functions
 def system(cmd):
 	print "makedist: Executing '%s'" % cmd
-	if os.system(cmd) != 0:
+	while os.system(cmd) != 0:
 		print 'makedist: Command "%s" failed.' % cmd
+		choice = raw_input('Abort, Retry, Ignore? (A/r/i) ')
+		choice = choice.lower()[0]
+		if choice == 'i':
+			return
+		elif choice == 'r':
+			continue
 		sys.exit(1)
 
 def copyfile(filename):
@@ -257,4 +263,4 @@ if dorpm and not noarch:
 	for build in BUILDS:
 		os.rmdir(build)
 
-os.system(POSTINSTALL)
+system(POSTINSTALL)
