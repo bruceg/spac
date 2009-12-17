@@ -2,7 +2,6 @@
 import glob
 import os
 import re
-import string
 import sys
 
 ###############################################################################
@@ -105,7 +104,7 @@ def deltreetrans(dir, prefix):
 ###############################################################################
 # Determine the version and package strings from the VERSION file, and read
 # in the configuration file.
-(PACKAGE,VERSION) = string.split(string.strip(open('VERSION').readline()), ' ')
+(PACKAGE,VERSION) = file('VERSION').readline().strip().split(' ')
 execfile('makedist.py')
 
 ###############################################################################
@@ -180,7 +179,7 @@ if dorpm:
 				rpmfiles.extend(renamerx(os.path.join(RPMDIR, dir), build, archrpmrx))
 	rpmfiles.extend(renamerx(SRPMDIR, '.', srcrpmrx))
 
-	system('rpm --resign %s' % string.join(rpmfiles, ' '))
+	system('rpm --resign %s' % ' '.join(rpmfiles))
 
 ###############################################################################
 # If a previous build left around an archive directory, remove it.
@@ -189,7 +188,7 @@ deltree(archiverdir)
 ###############################################################################
 # Determine what the previous version of the software was.
 try:
-	LAST_VERSION = string.strip(open(lastfile).readline())
+	LAST_VERSION = file(lastfile).readline().strip()
 except IOError:
 	versions = os.listdir(archivedir)
 	versions.sort()
@@ -237,7 +236,7 @@ system('make -C %s/websites/%s' % (HOME, WEBSITE))
 # Send out an announcement to mailing lists.
 #system("signed-mailsubj 'Announcing %s version %s' %s < ANNOUNCEMENT" % (
 system("mutt -s 'Announcing %s version %s' -i ANNOUNCEMENT %s" % (
-	PACKAGE, VERSION, string.join(LISTS, ' ')))
+	PACKAGE, VERSION, ' '.join(LISTS)))
 
 ###############################################################################
 # Tag the package in the subversion with the release number.
@@ -253,7 +252,7 @@ if os.path.isdir('.git'):
 # Optionally upload the RPMs to FTP sites.
 #for (host,path) in RPMUPLOAD:
 #	system("ncftpput -r 16 %s %s %s" % (
-#		host, path, string.join(rpmfiles, ' ')))
+#		host, path, ' '.join(rpmfiles)))
 
 os.unlink(tar)
 os.unlink(sig)

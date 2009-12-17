@@ -1,6 +1,5 @@
 import glob
 import os
-import string
 import sys
 
 from WriteFile import WriteFile
@@ -22,7 +21,7 @@ def write(ruleset, filename='Makefile'):
 	
 	makefile = WriteFile('Makefile')
 	makefile.write(header)
- 	#makefile.write("everything: %s\n\n" % string.join(names, ' '))
+	#makefile.write("everything: %s\n\n" % ' '.join(names))
 	
 	for name in names:
 		makefile.write(str(ruleset[name]))

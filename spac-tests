@@ -1,7 +1,6 @@
 #!/usr/bin/python2
 import os
 import re
-import string
 import sys
 
 def fatal(str):
@@ -19,20 +18,20 @@ def split(str):
 		if str[pos] == ' ':
 			pos = pos + 1
 		elif str[pos] == "'" or str[pos] == '"':
-			end = string.find(str, str[pos], pos+1)
+			end = str.find(str[pos], pos+1)
 			if end == -1:
 				fatal("Terminating quote not found in '%s'" % str)
 			list.append(str[pos+1:end])
 			pos = end + 1
 		else:
-			end = string.find(str, ' ', pos)
+			end = str.find(' ', pos)
 			if end == -1: end = len(str)
 			list.append(str[pos:end])
 			pos = end + 1
 	return list
 
 def join(list):
-	return string.join(map(lambda l:"'%s'"%l, list), ' ')
+	return ' '.join([ "'%s'"%l for l in list ])
 
 def permuter(lists):
 	if len(lists) == 0: return [[]]
@@ -70,16 +69,16 @@ class Test:
 		for var in self.loop_vars:
 			s.append('local %s="$%i"' % (var, i))
 			i = i + 1
-		s.append(string.rstrip(self.test))
+		s.append(self.test.rstrip())
 		s.append('}')
 		for result in self.loop_perm:
 			s.append("run_compare_test %s %s <<END_OF_TEST_RESULTS" % (
 				self.name, join(result)))
-			res = string.rstrip(self.results[result])
+			res = self.results[result].rstrip()
 			if res: s.append(res)
 			s.append('END_OF_TEST_RESULTS')
 			s.append('')
-		return string.join(s, '\n')
+		return '\n'.join(s)
 
 def rangevals(lists):
 	return apply(map, (None,)+tuple(lists))
@@ -111,7 +110,7 @@ def parse_test(name):
 		match = rx_meta.search(file, start)
 		if not match: break
 		(field,value) = match.groups()
-		field = string.lower(field)
+		field = field.lower()
 		value = split(value)
 		if field == 'asserts':
 			(ast,) = value

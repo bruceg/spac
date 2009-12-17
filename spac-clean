@@ -1,10 +1,9 @@
 #!/usr/bin/python2
-import string
 import os
 
 def rmlist(listname, type):
 	try:
-		list = map(string.rstrip, open(listname).readlines())
+		list = [ l.rstrip() for l in file(listname) ]
 	except IOError:
 		return
 	for filename in list:

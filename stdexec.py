@@ -2,7 +2,6 @@ import fnmatch
 import glob
 import os
 import re
-import string
 import sys
 import time
 
@@ -109,7 +108,6 @@ std_globals = {
 	'read': read,
 	'scan_cpp': scan_cpp,
 	'scan_libs': scan_libs,
-	'string': string,
 	'time': time,
 	}
 

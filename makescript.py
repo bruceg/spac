@@ -1,6 +1,5 @@
 import glob
 import os
-import string
 import sys
 
 from WriteFile import WriteFile
@@ -66,7 +65,7 @@ def recurse(name, targets, out):
 		command = oldcom.pop()
 		while command[-1] == '\\':
 			command = command[:-1] + oldcom.pop()
-		command = string.replace(command, '$$', '$')
+		command = command.replace('$$', '$')
 		newcom.append(command)
 	out.write("make(%s, %s, %s)\n" % (repr(name), repr(newcom),
 									  repr(target.dependancies)))

@@ -1,6 +1,5 @@
 import glob
 import os
-import string
 import sys
 import types
 
@@ -8,7 +7,7 @@ import files
 import stdexec
 
 def join(list, sep=' '):
-	return string.join(list, sep)
+	return sep.join(list)
 
 class Rule:
 	def __init__(self, commands, depstring, makecmds,
@@ -20,7 +19,7 @@ class Rule:
 		self.stemend = stemend
 	def apply(self, target):
 		try:
-			base = target[:string.rindex(target, '.')]
+			base = target[:target.rindex('.')]
 		except ValueError:
 			base = None
 		(dirname, basename) = os.path.split(target)
@@ -45,7 +44,7 @@ class Rule:
 		globls['deplist_pre'] = join(dependancies)
 		globls['deplist'] = join(dependancies)
 		if self.depstring:
-			newdep = string.split(self.depstring % locals(), ' ')
+			newdep = (self.depstring % locals()).split(' ')
 			newdep.extend(dependancies)
 			dependancies = newdep
 		globls['deplist'] = join(dependancies)
@@ -72,7 +71,7 @@ def _load_rule(path):
 		if lines[i][:1] == ':':
 			commands = ''.join(lines[:i])
 			depstring = lines[i][1:].strip()
-			makecmds = map(string.rstrip, lines[i+1:])
+			makecmds = [ line.rstrip() for line in lines[i+1:] ]
 			break
 	return Rule(commands, depstring, makecmds, stemstart, stemend)
 

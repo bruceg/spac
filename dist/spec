@@ -1,7 +1,7 @@
 if os.path.exists('spec'):
 	spec = open('spec').read()
-	spec = string.replace(spec, '@PACKAGE@', package)
-	spec = string.replace(spec, '@VERSION@', version)
+	spec = spec.replace('@PACKAGE@', package)
+	spec = spec.replace('@VERSION@', version)
 	badpaths = {
 		' /tmp':            '_tmppath',
 		'/usr/bin':        '_bindir',

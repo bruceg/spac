@@ -7,7 +7,7 @@ def recurse_imports(module):
 	try: file = open(filename)
 	except: return ( )
 	imports = { module: 1 }
-	file = map(string.strip, file.readlines())
+	file = [ line.strip() for line in file ]
 	list1 = filter(None, map(rx_import1.match, file))
 	list2 = filter(None, map(rx_import2.match, file))
 	for match in list1+list2:

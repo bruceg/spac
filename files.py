@@ -1,6 +1,5 @@
 import os
 import stat
-import string
 import sys
 import types
 
@@ -27,7 +26,7 @@ def read(name):
 def readlines(name):
 	pair = open_stat(name)
 	if pair is None: return
-	file = map(string.rstrip, string.split(pair[0], '\n'))
+	file = [ s.rstrip() for s in pair[0].split('\n') ]
 	if file[len(file)-1] == '':
 		file.pop()
 	return file

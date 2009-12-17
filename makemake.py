@@ -1,6 +1,5 @@
 import glob
 import os
-import string
 import sys
 
 from WriteFile import WriteFile
@@ -21,7 +20,7 @@ autofiles = [ 'Makefile', 'AUTOFILES', 'SRCFILES', 'TARGETS' ]
 
 def split_ext(filename, div='.'):
 	try:
-		i = string.rindex(filename, div)
+		i = filename.rindex(div)
 		return (filename[:i], filename[i+1:])
 	except ValueError:
 		return (filename, None)
@@ -29,7 +28,7 @@ def split_ext(filename, div='.'):
 def debug(*str):
 	global opt_debug
 	if opt_debug:
-		print 'debug:', string.join(str, ' ')
+		print 'debug:', ' '.join(str)
 
 class Rule:
 	def __init__(self, targets = None, dependancies = None, commands = None):

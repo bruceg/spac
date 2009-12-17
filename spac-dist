@@ -1,14 +1,13 @@
 #!/usr/bin/python2
-import string
 import sys
 
 def die(msg):
 	raise SystemExit, "spac-dist: Error: %s" % msg
 
-try: version = string.strip(open('VERSION').readline())
+try: version = file('VERSION').readline().strip()
 except IOError:	die("Missing VERSION file for building distribution.")
 
-try: (package,version) = string.split(version, ' ')
+try: (package,version) = version.split(' ')
 except ValueError: die("Invalid VERSION file")
 
 import dist

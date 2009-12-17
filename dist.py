@@ -1,6 +1,5 @@
 import glob
 import os
-import string
 import sys
 
 from WriteFile import WriteFile
@@ -114,7 +113,7 @@ def main(package, version):
 	files = build_files(package, version)
 
 	filelist = files.keys()
-	files[FILES] = string.join(filelist, '\n') + '\n'
+	files[FILES] = '\n'.join(filelist) + '\n'
 	
 	base = package + "-" + version
 	os.mkdir(base, 0777)
