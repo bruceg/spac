@@ -38,7 +38,8 @@ except:
 	except:
 		readme = ''
 
-today = '%04i-%02i-%02i' % time.localtime(time.time())[:3]
+localtime = time.localtime(time.time())
+today = '%04i-%02i-%02i' % localtime[:3]
 year = '%04i' % localtime[0]
 ann += readme \
 	.replace('@VERSION@', version) \
