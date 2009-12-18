@@ -1,5 +1,5 @@
-dependon([target+'.sh'])
 dependon(readlist(target+'=sh', dir))
+dependon([target+'.sh'])
 : warn-auto.sh
 cat %(deplist)s >%(target)s
 chmod 755 %(target)s
