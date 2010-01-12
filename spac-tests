@@ -65,7 +65,12 @@ class Test:
 		return "Test(%s)" % `self.name`
 
 	def script(self):
-		s = [ '', '##### Test %s #####'%self.name, '', 'runtest() {' ]
+		s = [
+			'',
+			'##### Test %s #####'%self.name,
+			'',
+			'runtest() {'
+			]
 		i = 1
 		for var in self.loop_vars:
 			s.append('local %s="$%i"' % (var, i))
@@ -73,6 +78,8 @@ class Test:
 		s.append(self.test.rstrip())
 		s.append('}')
 		for result in self.loop_perm:
+			s.append('vecho Running test %s %s' % (
+				self.name, join(result)))
 			s.append("run_compare_test %s %s <<END_OF_TEST_RESULTS" % (
 				self.name, join(result)))
 			res = self.results[result].rstrip()
@@ -229,6 +236,15 @@ tests_failed=0
 tests_count=0
 _UID=`id -u`
 _GID=`id -g`
+
+vecho() { :; }
+while getopts v flag
+do
+  case $flag in
+    v)      vecho() { echo "$*"; } ;;
+    \? | :) exit 1 ;;
+  esac
+done
 ''')
 
 if os.path.exists('tests.inc'):
@@ -266,6 +282,6 @@ echo $tests_count tests executed, $tests_failed failures
 if [ $tests_failed != 0 ]; then exit 1; fi
 ''')
 out.close()
-if subprocess.call(['sh', 'tests.sh']) != 0:
+if subprocess.call(['sh', 'tests.sh'] + sys.argv[1:]) != 0:
 	print 'Tests failed!'
 	sys.exit(1)
