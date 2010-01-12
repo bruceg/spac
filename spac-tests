@@ -1,5 +1,6 @@
 #!/usr/bin/python2
 import os
+import subprocess
 import re
 import sys
 
@@ -265,6 +266,6 @@ echo $tests_count tests executed, $tests_failed failures
 if [ $tests_failed != 0 ]; then exit 1; fi
 ''')
 out.close()
-if os.system('sh tests.sh') != 0:
+if subprocess.call(['sh', 'tests.sh']) != 0:
 	print 'Tests failed!'
 	sys.exit(1)
