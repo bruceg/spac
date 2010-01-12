@@ -237,12 +237,16 @@ tests_count=0
 _UID=`id -u`
 _GID=`id -g`
 
+usage() {
+  echo "usage: sh $0 [-v]"
+}
+
 vecho() { :; }
 while getopts v flag
 do
   case $flag in
     v)      vecho() { echo "$*"; } ;;
-    \? | :) exit 1 ;;
+	*)      usage; exit 1 ;;
   esac
 done
 ''')
