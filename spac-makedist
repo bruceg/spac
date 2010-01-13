@@ -2,6 +2,7 @@
 import glob
 import os
 import re
+import subprocess
 import sys
 
 ###############################################################################
@@ -17,7 +18,7 @@ POSTINSTALL = ''
 # Common functions
 def system(cmd):
 	print "makedist: Executing '%s'" % cmd
-	while os.system(cmd) != 0:
+	while subprocess.call(cmd, shell=True) != 0:
 		print 'makedist: Command "%s" failed.' % cmd
 		choice = raw_input('Abort, Retry, Ignore? (A/r/i) ')
 		choice = choice.lower()[0]
@@ -121,7 +122,7 @@ tar = distdir + '.tar.gz'
 sig = tar + '.sig'
 archrpmrx = re.compile('^.*-%s-[0123456789]+\..*\.rpm$' % VERSION)
 srcrpmrx = re.compile('^%s-[0123456789]+\.src\.rpm$' % distdir)
-noarch = os.system("grep '^BuildArch: noarch$' spec >/dev/null 2>&1") == 0
+noarch = subprocess.call(['grep', '-q', '^BuildArch: noarch$', 'spec']) == 0
 
 ###############################################################################
 # Make sure all changes are committed to the subversion repository before
