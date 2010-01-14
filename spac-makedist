@@ -16,9 +16,10 @@ POSTINSTALL = ''
 
 ###############################################################################
 # Common functions
-def system(cmd):
+devnull = os.open('/dev/null', os.O_RDWR)
+def system(cmd, **kwargs):
 	print "makedist: Executing '%s'" % cmd
-	while subprocess.call(cmd, shell=True) != 0:
+	while apply(subprocess.call, [cmd], kwargs) != 0:
 		print 'makedist: Command "%s" failed.' % cmd
 		choice = raw_input('Abort, Retry, Ignore? (A/r/i) ')
 		choice = choice.lower()[0]
@@ -139,30 +140,30 @@ if os.path.isdir('.svn'):
 	svn_base = svn_url
 	if svn_base[-6:] == '/trunk':
 		svn_base = svn_base[:-6]
-	system('test $( svn diff | wc -c ) = 0')
+	system('test $( svn diff | wc -c ) = 0', shell=True)
 elif os.path.isdir('.git'):
-	system('test $( git diff | wc -c ) = 0')
+	system('test $( git diff | wc -c ) = 0', shell=True)
 
 ###############################################################################
 # Make sure all system dependancies are covered
-system('spac')
+system(['spac'])
 #system('spac-sysdeps')
-system('make </dev/null')
+system('make </dev/null', shell=True)
 if os.path.exists('tests') and os.path.exists('tests.sh'):
-	system('spac-tests')
-	system('dash tests.sh')
-	system('ksh tests.sh')
+	system(['spac-tests'])
+	system(['dash', 'tests.sh'])
+	system(['ksh', 'tests.sh'])
 
 ###############################################################################
 # Make the distribution tarball.
-system('spac-dist')
+system(['spac-dist'])
 
 ###############################################################################
 # Build the RPM sets
 
 # FIXME: Need to write rpm log to file, and grep for "Wrote: ...RPMS/..." lines
 # FIXME: Drop the hard-coded i386 target?
-rpmcmd = "cd %(CWD)s && nice rpmbuild -ta --clean --target=i386 %(tar)s" % vars()
+rpmcmd = ['nice', 'rpmbuild', '-ta', '--clean', '--target=i386', tar]
 rpmfiles = [ ]
 
 dorpm = os.path.exists('spec') and not os.path.exists('spec.dist')
@@ -175,12 +176,12 @@ if dorpm:
 		for build in BUILDS:
 			deltree(build)
 			os.mkdir(build)
-			system("/roots/%(build)s/exec '%(rpmcmd)s'" % vars())
+			system(['/roots/%s/exec' % build, ' '.join(rpmcmd)])
 			for dir in os.listdir(RPMDIR):
 				rpmfiles.extend(renamerx(os.path.join(RPMDIR, dir), build, archrpmrx))
 	rpmfiles.extend(renamerx(SRPMDIR, '.', srcrpmrx))
 
-	system('rpm --resign %s' % ' '.join(rpmfiles))
+	system(['rpm', '--resign'] + rpmfiles)
 
 ###############################################################################
 # If a previous build left around an archive directory, remove it.
@@ -228,26 +229,25 @@ if LAST_VERSION:
 	deltreetrans(os.path.join(archivedir, LAST_VERSION), DSTDIR)
 linktree(archiverdir, DSTDIR)
 
-system('chmod -R -w %(archiverdir)s' % vars())
+system(['chmod', '-R', '-w', archiverdir])
 open(lastfile, 'w').write('%s\n' % VERSION)
 
-system('make -C %s/websites/%s' % (HOME, WEBSITE))
+system(['make', '-C', '%s/websites/%s' % (HOME, WEBSITE)])
 
 ###############################################################################
 # Send out an announcement to mailing lists.
 #system("signed-mailsubj 'Announcing %s version %s' %s < ANNOUNCEMENT" % (
-system("mutt -s 'Announcing %s version %s' -i ANNOUNCEMENT %s" % (
-	PACKAGE, VERSION, ' '.join(LISTS)))
+system(['mutt', '-s', 'Announcing %s version %s' % (PACKAGE, VERSION),
+		'-i', 'ANNOUNCEMENT'] + LISTS)
 
 ###############################################################################
 # Tag the package in the subversion with the release number.
 if os.path.isdir('.svn'):
-	system("svn copy '%s' '%s/tags/%s' -m 'Tagged version %s'" % (
-		svn_url, svn_base, VERSION, VERSION))
+	system(['svn', 'copy', svn_url, '%s/tags/%s' % (svn_base, VERSION),
+			'-m', 'Tagged version ' + VERSION])
 if os.path.isdir('.git'):
-	system("git tag -s -m 'Version %s' %s" % (
-		VERSION, VERSION ))
-	system('git push origin master %s' % VERSION)
+	system(['git', 'tag', '-s', '-m', 'Version ' + VERSION, VERSION])
+	system(['git', 'push', 'origin', 'master', VERSION])
 
 ###############################################################################
 # Optionally upload the RPMs to FTP sites.
@@ -263,4 +263,4 @@ if dorpm and not noarch:
 	for build in BUILDS:
 		os.rmdir(build)
 
-system(POSTINSTALL)
+system(POSTINSTALL, shell=True)
