@@ -4,6 +4,6 @@
   echo 'source=$$1; shift'; \
   echo 'base=`echo "$$source" | sed -e s:\\\\.py$$::`'; \
   echo 'rm -f "$$base".pyc'; \
-  echo exec `head -n 1 auto-python` "-c \"__import__('\$${base}')\""; \
+  echo exec `head -n 1 auto-python` "-c \"import py_compile; py_compile.compile('\$${base}.py')\""; \
 ) >compilepy
 chmod 755 compilepy
