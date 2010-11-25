@@ -13,5 +13,7 @@ elif base[-2:] == '.1' and os.path.exists(base[:-2]+'.cli'):
 elif base[-2] == '.' and base[-1] in '12345678':
 	dependon([base])
 	command('man2html %(base)s >%(base)s.html' % locals())
+elif os.path.exists(target):
+	raise IOError
 else:
-	raise ValueError
+	raise ValueError, "No source for %s found" % target
