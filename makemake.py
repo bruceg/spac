@@ -7,10 +7,6 @@ import files
 import makefile
 import rules
 
-ALL = intern('all')
-TOP = intern('TOP')
-DEFAULT = intern('DEFAULT')
-
 # Global 
 opt_debug = 0
 ruleset = { }
@@ -97,16 +93,16 @@ def recurse_deps(deps):
 			recurse_deps(moredeps)
 	
 def make_ruleset():
-	( targets, top, commands ) = rules.match(TOP)
+	( targets, default_deps, default_commands ) = rules.match('DEFAULT')
+	recurse_deps(default_deps)
+	( targets, top, commands ) = rules.match('TOP')
 	recurse_deps(top)
 
 	global missing
 	if missing:
 		raise SystemExit, "Missing dependancies encountered, aborting."
 
-	return (
-		dict([ (rule.targets,rule) for rule in ruleset.values() ]),
-		ruleset.keys(),
-		srcfiles,
-		autofiles
-		)
+	targets = ruleset.keys()
+	ruleset['DEFAULT'] = Rule(('DEFAULT',), default_deps, default_commands)
+	rruleset = dict([ (rule.targets,rule) for rule in ruleset.values() ])
+	return ( rruleset, targets, srcfiles, autofiles )

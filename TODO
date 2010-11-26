@@ -1,8 +1,8 @@
+- Make the make rules output to a temporary file, rename to the target
+
 - Fix spac to include =x and =l files in package.
 
 - Fix spac-sysdeps to account for new bglibs code.
-
-- Actually read the DEFAULT rule and add it to the top of the Makefile.
 
 - Add system dependancy for sys_errlist and sys_nerr.
 

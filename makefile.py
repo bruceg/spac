@@ -11,18 +11,24 @@ header = """\
 
 SHELL=/bin/sh
 
-DEFAULT: all
-
 """
 
 def write(ruleset, filename='Makefile'):
 	names = ruleset.keys()
 	names.sort()
-	
+
 	makefile = WriteFile('Makefile')
 	makefile.write(header)
 	#makefile.write("everything: %s\n\n" % ' '.join(names))
-	
+
+	# Make sure the DEFAULT rule goes on top
+	try:
+		names.remove(('DEFAULT',))
+	except KeyError:
+		pass
+	else:
+		makefile.write(str(ruleset[('DEFAULT',)]))
+		makefile.write('\n')
 	for name in names:
 		makefile.write(str(ruleset[name]))
 		makefile.write('\n')
