@@ -83,9 +83,9 @@ def scan_libs(filename):
 	def sourcepath(object, dir=os.path.split(filename)[0]):
 		if object[-4:] == '.lib' \
 			   or object.find('/') >= 0:
-			return object
+			return os.path.normpath(object)
 		return os.path.join(dir, object)
-	options = [ s for s in sources if s[0] == '-' or s[0] == '.' ]
+	options = [ s for s in sources if s[0] == '-' ]
 	for option in options:
 		sources.remove(option)
 	sources = [ sourcepath(s) for s in sources ]
