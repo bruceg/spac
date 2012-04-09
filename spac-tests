@@ -78,7 +78,7 @@ class Test:
 		s.append(self.test.rstrip())
 		s.append('}')
 		for result in self.loop_perm:
-			s.append('vecho Running test %s %s' % (
+			s.append('vecho "Running test %s %s"' % (
 				self.name, join(result)))
 			s.append("run_compare_test %s %s <<END_OF_TEST_RESULTS" % (
 				self.name, join(result)))
@@ -267,7 +267,7 @@ run_compare_test() {
   cat -v $tmp/actual-raw >$tmp/actual
   if ! cmp $tmp/expected $tmp/actual >/dev/null 2>&1
   then
-    echo "Test $name $@ failed:"
+    echo "Test $name $* failed:"
 	( cd $tmp; diff -U 9999 expected actual | tail -n +3; echo; )
 	tests_failed=$(($tests_failed+1))
   fi
