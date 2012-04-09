@@ -3,9 +3,9 @@ if os.path.exists(base+'.texi'):
 	if os.path.exists('texi2html.conf'):
 		ini = '--init-file=texi2html.conf'
 		dependon(['texi2html.conf'])
+		command('texi2html %(ini)s --toc-file=%(base)s.html --top-file=%(base)s.html -nosec-nav %(base)s.texi' % locals())
 	else:
-		ini = ''
-	command('texi2html %(ini)s --toc-file=%(base)s.html --top-file=%(base)s.html -nosec-nav %(base)s.texi' % locals())
+		command('makeinfo --html --no-split %(base)s.texi' % locals())
 elif base[-2:] == '.1' and os.path.exists(base[:-2]+'.cli'):
 	base = base[:-2]+'.cli'
 	dependon([base])
