@@ -64,16 +64,13 @@ def scan_cpp(filename,already=None):
 	match = rx_include.search(file)
 	while match:
 		inctype,inc = match.groups()
-		try:
-			incs = scan_cpp(inc, already)
-		except IOError:
+		incs = [ ] if inctype == '<' else [ inc ]
+		for incpath in [ '', path ]:
 			try:
-				incs = scan_cpp(os.path.join(path, inc), already)
+				incs = scan_cpp(os.path.join(incpath, inc), already)
 			except IOError:
-				if inctype == '<':
-					incs = [ ]
-				else:
-					incs = [ inc ]
+				continue
+			break
 		deps.extend(incs or [ ])
 		match = rx_include.search(file, match.end())
 	return deps
