@@ -4,6 +4,8 @@ if not os.path.exists('no-bglibs'):
 	dependon(['conf-bgincs'])
 	cmd_extra = 'bgincs=`head -n 1 conf-bgincs`;'
 	inc_extra = '"-I\'$${bgincs}\'"'
+for line in files.readlines('build-includes') or []:
+	inc_extra += ' "-I\'%s\'"' % line
 : conf-cc
 ( %(cmd_extra)s \
   if libtool --tag=CC --help >/dev/null 2>&1; then tag='--tag=CC'; fi; \

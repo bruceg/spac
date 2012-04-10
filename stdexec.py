@@ -62,10 +62,12 @@ def scan_cpp(filename,already=None):
 		raise IOError
 	deps = [ filename ]
 	match = rx_include.search(file)
+	build_incpaths = files.readlines('build-includes') or [ ]
+	incpaths = [ '', path ] + build_incpaths
 	while match:
 		inctype,inc = match.groups()
 		incs = [ ] if inctype == '<' else [ inc ]
-		for incpath in [ '', path ]:
+		for incpath in incpaths:
 			try:
 				incs = scan_cpp(os.path.join(incpath, inc), already)
 			except IOError:
