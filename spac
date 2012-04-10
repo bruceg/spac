@@ -1,5 +1,6 @@
 #!/usr/bin/python
 import getopt
+import os
 import sys
 
 from WriteFile import WriteFile
@@ -26,6 +27,14 @@ for (option,value) in opts:
 		opt_verbose = 1
 
 makemake.opt_debug = opt_verbose
+
+# Clean out previously generated files
+if os.path.exists('TARGETS'):
+	for line in file('TARGETS'):
+		try:
+			os.unlink(line.rstrip())
+		except:
+			pass
 
 rules.load_all()
 ( ruleset, targets, srcfiles, autofiles ) = makemake.make_ruleset()
