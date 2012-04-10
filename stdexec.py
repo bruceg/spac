@@ -72,7 +72,8 @@ def scan_cpp(filename,already=None):
 				incs = scan_cpp(os.path.join(incpath, inc), already)
 			except IOError:
 				continue
-			break
+			if incs is not None:
+				break
 		deps.extend(incs or [ ])
 		match = rx_include.search(file, match.end())
 	return deps
