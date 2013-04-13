@@ -146,9 +146,16 @@ elif os.path.isdir('.git'):
 
 ###############################################################################
 # Make sure all system dependancies are covered
+try:
+    TOP = open('TOP.spac').readline().strip().split(' ')
+    TOP.remove(':')
+    TOP = [ t for t in TOP if not t.startswith('clean') and not t.startswith('install') ]
+    TOP = ' '.join(TOP)
+except IOError:
+    TOP = 'all'
 system(['spac'])
 #system('spac-sysdeps')
-system('make </dev/null', shell=True)
+system('make %s </dev/null' % TOP, shell=True)
 if os.path.exists('tests') and os.path.exists('tests.sh'):
 	system(['spac-tests'])
 	system(['dash', 'tests.sh'])
