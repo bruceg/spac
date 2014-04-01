@@ -59,10 +59,9 @@ patterns = { }
 
 executables = [ ]
 
-def _load_rule(path):
-	base = os.path.basename(path)
-	stemstart = base.find('%')
-	stemend = stemstart - len(base) + 1
+def _load_rule(path, entry):
+	stemstart = entry.find('%')
+	stemend = stemstart - len(entry) + 1
 	lines = open(path).readlines()
 	commands = ''.join(lines)
 	depstring = None
@@ -79,7 +78,7 @@ def _add_rule(fullpath, entry):
 	global executables
 	global targets
 	if not os.path.isfile(fullpath): return
-	rule = _load_rule(fullpath)
+	rule = _load_rule(fullpath, entry)
 	try:
 		i = entry.index('%')
 		patterns[(entry[:i],entry[i+1:])] = rule
