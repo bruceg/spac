@@ -14,9 +14,9 @@ def readlist(filename, dirname=None):
 	list = files.readlines(filename)
 	if list is None: raise IOError
 	if dirname:
-		list = map(lambda i,d=dirname:os.path.join(d,i), list)
+		list = list(map(lambda i,d=dirname:os.path.join(d,i), list))
 	#list = map(os.path.normpath, list)
-	if debug: print "readlist(%s,%s)=>%s" % (filename,dirname,list)
+	if debug: print("readlist(%s,%s)=>%s" % (filename,dirname,list))
 	return list
 
 _recglob_cache = None
@@ -35,7 +35,7 @@ def recglob(pattern):
 	global _recglob_cache
 	if _recglob_cache is None:
 		_recglob_cache = findfiles('')
-	return filter(lambda f,p=pattern:fnmatch.fnmatch(f,p), _recglob_cache)
+	return list(filter(lambda f,p=pattern:fnmatch.fnmatch(f,p), _recglob_cache))
 
 def read(filename):
 	tmp = files.read(filename)
@@ -44,14 +44,14 @@ def read(filename):
 	return tmp
 
 def fail():
-	print 'Execution failed!'
+	print('Execution failed!')
 	sys.exit(1)
 
 rx_include = re.compile(r'^\s*#\s*include\s+([<"])([^">]+)[">]\s*$', re.MULTILINE)
 def scan_cpp(filename,already=None):
 	if not already:
 		already = { }
-	if already.has_key(filename):
+	if filename in already:
 		return
 	if files.copy(filename) or rules.match(filename):
 		return [ filename ]
@@ -93,7 +93,7 @@ def scan_libs(filename):
 
 	return (
 		sources,
-		' '.join([ s for s in sources if s[-4:] <> '.lib' ]),
+		' '.join([ s for s in sources if s[-4:] != '.lib' ]),
 		' '.join(options),
 		' '.join(dotlibs)
 		)
@@ -117,4 +117,4 @@ def stdexec(code, global_env):
 
 def stdexecfile(filename, global_env):
 	global_env.update(std_globals)
-	return execfile(filename, global_env)
+	return exec(compile(open(filename).read(), filename, 'exec'), global_env)

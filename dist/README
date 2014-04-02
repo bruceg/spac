@@ -12,7 +12,7 @@ try:
 except IOError:
 	pass
 readme = open('README').read()
-if readme[:readme.index('\n')] <> package:
+if readme[:readme.index('\n')] != package:
 	print "README doesn't have the package name as the first line."
 	fail()
 if not re.search('^version %s$'%version, readme, re.MULTILINE|re.IGNORECASE):

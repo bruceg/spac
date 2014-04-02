@@ -5,7 +5,7 @@ import sys
 from WriteFile import WriteFile
 import stdexec
 
-FILES = intern('FILES')
+FILES = sys.intern('FILES')
 
 loaded_rules = { }
 
@@ -36,7 +36,7 @@ class FileList:
 			try:
 				content = open(filename).read()
 			except IOError:
-				raise SystemExit, "Missing file: '%s'" % filename
+				raise SystemExit("Missing file: '%s'" % filename)
 		self.filelist[filename] = content
 	def add_list(self, list):
 		for item in list:
@@ -45,17 +45,17 @@ class FileList:
 		for item in recurse_dir(dir):
 			self.add_one(item, None)
 	def del_one(self, filename):
-		if self.filelist.has_key(filename):
+		if filename in self.filelist:
 			del self.filelist[filename]
 	def del_list(self, list):
 		for item in list:
 			self.del_one(item)
 	def merge_list(self, list):
 		for item in list:
-			if not self.filelist.has_key(item):
+			if item not in self.filelist:
 				self.filelist[item] = None
 	def keys(self):
-		list = self.filelist.keys()
+		list = list(self.filelist.keys())
 		list.sort()
 		return list
 	def __getitem__(self, key): return self.filelist[key]
@@ -63,10 +63,10 @@ class FileList:
 
 def load_file(fullpath, base, globls):
 	global loaded_rules
-	if loaded_rules.has_key(base):
+	if base in loaded_rules:
 		return
 	loaded_rules[base] = 1
-	print "Loading dist rules from '%s'" % fullpath
+	print("Loading dist rules from '%s'" % fullpath)
 	return stdexec.stdexecfile(fullpath, globls)
 
 def load_dir(path, globls):
@@ -102,7 +102,7 @@ def copyfile(filename, contents, directory):
 	filename = os.path.join(directory, filename)
 	(dir,ign) = os.path.split(filename)
 	try:
-		os.makedirs(dir, 0755)
+		os.makedirs(dir, 0o755)
 	except OSError:
 		pass
 	out = open(filename, 'w')
@@ -112,20 +112,20 @@ def copyfile(filename, contents, directory):
 def main(package, version):
 	files = build_files(package, version)
 
-	filelist = files.keys()
+	filelist = list(files.keys())
 	files[FILES] = '\n'.join(filelist) + '\n'
 	
 	base = package + "-" + version
-	os.mkdir(base, 0777)
+	os.mkdir(base, 0o777)
 	for file in filelist:
 		copyfile(file, files[file], base)
 
-	print "Writing tarball '%s.tar.gz'" % base
+	print("Writing tarball '%s.tar.gz'" % base)
 	try: os.unlink('%s.tar.gz' % base)
 	except OSError: pass
 	os.system('tar -cf - %s | gzip -9 >%s.tar.gz' % (base, base))
 
-	print "Cleaning up"
+	print("Cleaning up")
 	os.system('rm -rf %s' % base)
 
 	os.system('md5sum %s.tar.gz' % base)

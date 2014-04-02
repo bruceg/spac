@@ -1,4 +1,4 @@
-#!/usr/bin/python2
+#!/usr/bin/python3
 import glob
 import os
 import re
@@ -18,10 +18,10 @@ POSTINSTALL = ''
 # Common functions
 devnull = os.open('/dev/null', os.O_RDWR)
 def system(cmd, **kwargs):
-	print "makedist: Executing '%s'" % cmd
-	while apply(subprocess.call, [cmd], kwargs) != 0:
-		print 'makedist: Command "%s" failed.' % cmd
-		choice = raw_input('Abort, Retry, Ignore? (A/r/i) ')
+	print("makedist: Executing '%s'" % cmd)
+	while subprocess.call(*[cmd], **kwargs) != 0:
+		print('makedist: Command "%s" failed.' % cmd)
+		choice = input('Abort, Retry, Ignore? (A/r/i) ')
 		choice = choice.lower()[0]
 		if choice == 'i':
 			return
@@ -32,7 +32,7 @@ def system(cmd, **kwargs):
 def copyfile(filename):
 	global archiverdir
 	dstpath = os.path.join(archiverdir, filename)
-	print "makedist: Copying %s = %s" % (filename, dstpath)
+	print("makedist: Copying %s = %s" % (filename, dstpath))
 	content = open(filename).read()
 	try: os.unlink(dstpath)
 	except OSError: pass
@@ -46,17 +46,17 @@ def forcelink(src, dst):
 def linkfile(filename):
 	global archiverdir
 	dstpath = os.path.join(archiverdir, filename)
-	print "makedist: Linking %s => %s" % (filename, dstpath)
+	print("makedist: Linking %s => %s" % (filename, dstpath))
 	return forcelink(filename, dstpath)
 
 def renamerx(srcpath, dstpath, rx):
 	result = [ ]
-	filenames = filter(rx.match, os.listdir(srcpath))
+	filenames = list(filter(rx.match, os.listdir(srcpath)))
 	for filename in filenames:
 		srcfile = os.path.join(srcpath, filename)
 		dstfile = os.path.join(dstpath, filename)
 		result.append(dstfile)
-		print "makedist: Moving %s => %s" % (srcfile, dstfile)
+		print("makedist: Moving %s => %s" % (srcfile, dstfile))
 		os.rename(srcfile, dstfile)
 	return result
 
@@ -65,12 +65,12 @@ def linktree(srcdir, dstdir):
 		srcpath = os.path.join(srcdir, file)
 		dstpath = os.path.join(dstdir, file)
 		if os.path.isdir(srcpath):
-			print "makedist: Creating directory %s" % dstpath
+			print("makedist: Creating directory %s" % dstpath)
 			try: os.mkdir(dstpath)
 			except OSError: pass
 			linktree(srcpath, dstpath)
 		else:
-			print "makedist: Linking %s => %s" % (file, dstpath)
+			print("makedist: Linking %s => %s" % (file, dstpath))
 			try: os.unlink(dstpath)
 			except OSError: pass
 			os.link(srcpath, dstpath)
@@ -85,9 +85,9 @@ def deltree(dir, unlinkprefix=None):
 				else:
 					deltree(path)
 			else:
-				print "makedist: Removing %s" % path
+				print("makedist: Removing %s" % path)
 				os.unlink(path)
-		print "makedist: Removing directory %s" % dir
+		print("makedist: Removing directory %s" % dir)
 		os.rmdir(dir)
 
 def deltreetrans(dir, prefix):
@@ -100,14 +100,14 @@ def deltreetrans(dir, prefix):
 				#print "makedist: Removing directory %s" % ppath
 				#os.rmdir(ppath)
 			else:
-				print "makedist: Removing %s" % ppath
+				print("makedist: Removing %s" % ppath)
 				os.unlink(ppath)
 
 ###############################################################################
 # Determine the version and package strings from the VERSION file, and read
 # in the configuration file.
-(PACKAGE,VERSION) = file('VERSION').readline().strip().split(' ')
-execfile('makedist.py')
+(PACKAGE,VERSION) = open('VERSION').readline().strip().split(' ')
+exec(compile(open('makedist.py').read(), 'makedist.py', 'exec'))
 
 ###############################################################################
 # Build some filename defines to simplify later steps.
@@ -129,10 +129,10 @@ noarch = subprocess.call(['grep', '-q', '^BuildArch: noarch$', 'spec']) == 0
 # Make sure all changes are committed to the subversion repository before
 # continuing.
 if os.path.exists('CVS'):
-	print "Please convert this package before continuing"
+	print("Please convert this package before continuing")
 if os.path.isdir('.svn'):
 	re_svn_url = re.compile(r'^\s*url="(.+)"\s*$')
-	entries = file('.svn/entries').read()
+	entries = open('.svn/entries').read()
 	if entries[:7] == '8\n\ndir\n':
 		svn_url = entries.split('\n')[4]
 	else:
@@ -197,7 +197,7 @@ deltree(archiverdir)
 ###############################################################################
 # Determine what the previous version of the software was.
 try:
-	LAST_VERSION = file(lastfile).readline().strip()
+	LAST_VERSION = open(lastfile).readline().strip()
 except IOError:
 	versions = os.listdir(archivedir)
 	versions.sort()
@@ -206,11 +206,11 @@ except IOError:
 
 ###############################################################################
 # Create an archive directory as it will be laid out on the web site.
-os.makedirs(archiverdir, 0755)
+os.makedirs(archiverdir, 0o755)
 for pattern in EXTRAS:
 	list = glob.glob(pattern)
 	if not list:
-		print 'makedist: Extra file "%s" not found' % pattern
+		print('makedist: Extra file "%s" not found' % pattern)
 		sys.exit(1)
 	for file in list:
 		copyfile(file)
@@ -218,17 +218,17 @@ linkfile(tar)
 linkfile(sig)
 if dorpm and not noarch:
 	for build in BUILDS:
-		os.mkdir(os.path.join(archiverdir, build), 0755)
+		os.mkdir(os.path.join(archiverdir, build), 0o755)
 for filename in rpmfiles: linkfile(filename)
 
 ###############################################################################
 # Wait for user response before committing the files to the website.
-raw_input('Press Enter to continue sending the installation to the web site:')
+input('Press Enter to continue sending the installation to the web site:')
 
 ###############################################################################
 # Delete the old version from the web site, and copy the release files on.
 if not os.path.isdir(os.path.join(DSTDIR, 'archive')):
-	os.makedirs(os.path.join(DSTDIR, 'archive'), 0755)
+	os.makedirs(os.path.join(DSTDIR, 'archive'), 0o755)
 forcelink(tar, os.path.join(DSTDIR, 'archive', tar))
 forcelink(sig, os.path.join(DSTDIR, 'archive', sig))
 forcelink(tar, os.path.join('/usr/portage/distfiles', tar))

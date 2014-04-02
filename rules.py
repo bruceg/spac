@@ -96,7 +96,7 @@ def _scan_rules_dir(path):
 def _scan_rules_ext(ext):
 	for fullpath in stdexec.recglob('*.%s' % ext):
 		entry = fullpath[:-len(ext)-1]
-		print "Adding local rule '%s' from '%s'" % (entry, fullpath)
+		print("Adding local rule '%s' from '%s'" % (entry, fullpath))
 		_add_rule(fullpath, entry)
 
 def load_all():
@@ -110,9 +110,9 @@ def load_all():
 
 def match(target):
 	rules = [ ]
-	if targets.has_key(target):
+	if target in targets:
 		rules.append(targets[target])
-	for key,rule in patterns.items():
+	for key,rule in list(patterns.items()):
 		prestem,poststem = key
 		if target[:len(prestem)] == prestem \
 			   and target[-len(poststem):] == poststem:

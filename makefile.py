@@ -14,7 +14,7 @@ SHELL=/bin/sh
 """
 
 def write(ruleset, filename='Makefile'):
-	names = ruleset.keys()
+	names = list(ruleset.keys())
 	names.sort()
 
 	makefile = WriteFile('Makefile')

@@ -24,7 +24,7 @@ def split_ext(filename, div='.'):
 def debug(*str):
 	global opt_debug
 	if opt_debug:
-		print 'debug:', ' '.join(str)
+		print('debug:', ' '.join(str))
 
 class Rule:
 	def __init__(self, targets = None, dependancies = None, commands = None):
@@ -56,7 +56,7 @@ def recurse_dep(dep):
 	global autofiles
 	global srcfiles
 	global missing
-	if ruleset.has_key(dep):
+	if dep in ruleset:
 		return None
 	if dep in srcfiles or dep in autofiles:
 		return None
@@ -82,7 +82,7 @@ def recurse_dep(dep):
 		srcfiles.append(dep)
 		return
 	except OSError:
-		print "Missing dependancy: '%s'" % dep
+		print("Missing dependancy: '%s'" % dep)
 		missing.append(dep)
 
 def recurse_deps(deps):
@@ -100,9 +100,9 @@ def make_ruleset():
 
 	global missing
 	if missing:
-		raise SystemExit, "Missing dependancies encountered, aborting."
+		raise SystemExit("Missing dependancies encountered, aborting.")
 
-	targets = ruleset.keys()
+	targets = list(ruleset.keys())
 	ruleset['DEFAULT'] = Rule(('DEFAULT',), default_deps, default_commands)
-	rruleset = dict([ (rule.targets,rule) for rule in ruleset.values() ])
+	rruleset = dict([ (rule.targets,rule) for rule in list(ruleset.values()) ])
 	return ( rruleset, targets, srcfiles, autofiles )

@@ -56,7 +56,7 @@ def recurse(name, targets, out):
 	global done
 	target = targets[name]
 	for dep in target.dependancies:
-		if targets.has_key(dep) and not done.has_key(dep):
+		if dep in targets and dep not in done:
 			recurse(dep, targets, out)
 	newcom = [ ]
 	oldcom = target.commands[:]

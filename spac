@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 import getopt
 import os
 import sys
@@ -12,14 +12,14 @@ opt_makedist = 0
 opt_verbose = 0
 
 def die(msg):
-	raise SystemExit, "spac: Error: %s" % msg
+	raise SystemExit("spac: Error: %s" % msg)
 
 try:
 	(opts, args) = getopt.getopt(sys.argv[1:], 'v')
-except getopt.error, msg:
-	print "spac: Error:", msg
-	print "spac: Usage: spac [-v]"
-	print "  -v  Show verbose build messages"
+except getopt.error as msg:
+	print("spac: Error:", msg)
+	print("spac: Usage: spac [-v]")
+	print("  -v  Show verbose build messages")
 	sys.exit(1)
 
 for (option,value) in opts:
@@ -30,7 +30,7 @@ makemake.opt_debug = opt_verbose
 
 # Clean out previously generated files
 if os.path.exists('TARGETS'):
-	for line in file('TARGETS'):
+	for line in open('TARGETS'):
 		try:
 			os.unlink(line.rstrip())
 		except:

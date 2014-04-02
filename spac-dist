@@ -1,10 +1,10 @@
-#!/usr/bin/python2
+#!/usr/bin/python3
 import sys
 
 def die(msg):
-	raise SystemExit, "spac-dist: Error: %s" % msg
+	raise SystemExit("spac-dist: Error: %s" % msg)
 
-try: version = file('VERSION').readline().strip()
+try: version = open('VERSION').readline().strip()
 except IOError:	die("Missing VERSION file for building distribution.")
 
 try: (package,version) = version.split(' ')

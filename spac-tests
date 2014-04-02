@@ -1,4 +1,4 @@
-#!/usr/bin/python2
+#!/usr/bin/python3
 import os
 import subprocess
 import re
@@ -36,7 +36,7 @@ def join(list):
 
 def permuter(lists):
 	if len(lists) == 0: return [[]]
-	if len(lists) == 1: return map(lambda i:(i,), lists[0])
+	if len(lists) == 1: return [(i,) for i in lists[0]]
 	result = [ ]
 	sublist = permuter(lists[1:])
 	for item in lists[0]:
@@ -46,15 +46,15 @@ def permuter(lists):
 	return result
 
 def permute(lists):
-	return map(tuple, permuter(lists))
+	return list(map(tuple, permuter(lists)))
 
 class Test:
 	def __init__(self, name, test, loops, res, req, ast, ret):
 		self.name = name
 		self.test = test
 		self.loops = loops
-		self.loop_vars = tuple(map(lambda l:l[0], loops))
-		self.loop_vals = tuple(map(lambda l:l[1], loops))
+		self.loop_vars = tuple([l[0] for l in loops])
+		self.loop_vals = tuple([l[1] for l in loops])
 		self.loop_perm = permute(self.loop_vals)
 		self.results = res
 		self.requires = req
@@ -62,7 +62,7 @@ class Test:
 		self.retracts = ret
 
 	def __repr__(self):
-		return "Test(%s)" % `self.name`
+		return "Test(%s)" % repr(self.name)
 
 	def script(self):
 		s = [
@@ -89,8 +89,8 @@ class Test:
 		return '\n'.join(s)
 
 def rangevals(lists):
-	return apply(map, (None,)+tuple(lists))
-	print lists
+	return list(map(*(None,)+tuple(lists)))
+	print(lists)
 
 rx_comment_start = re.compile(r'<!')
 rx_comment_end = re.compile(r'>\s*($|)')
@@ -135,7 +135,7 @@ def parse_test(name):
 			else:
 				results[result] = part
 			value = tuple(value)
-			if results.has_key(value):
+			if value in results:
 				fatal("Result %s defined twice in %s" % (value, name))
 			result = value
 		else:
@@ -149,8 +149,8 @@ def parse_test(name):
 		fatal("Cannot both assert and retract in same test (%s)" % name)
 	if req and ret:
 		fatal("Cannot both require and retract in same test (%s)" % name)
-	for result in permute(map(lambda x:x[1], loops)):
-		if not results.has_key(result):
+	for result in permute([x[1] for x in loops]):
+		if result not in results:
 			fatal("Result %s not defined in %s" % (result, name))
 	return Test(name, test, loops, results, req, ast, ret)
 
@@ -182,7 +182,7 @@ for test in tests:
 			except: requires[req] = [test]
 	if test.asserts:
 		a = test.asserts
-		if asserts.has_key(a):
+		if a in asserts:
 			fatal("Assertion %s is raised by both %s and %s" % (
 				a, asserts[a].name, test.name ))
 		asserts[a] = test
@@ -191,16 +191,16 @@ for test in tests:
 		try: retracts[r].append(test)
 		except: retracts[r] = [test]
 
-for r in requires.keys():
-	if not asserts.has_key(r):
+for r in list(requires.keys()):
+	if r not in asserts:
 		fatal("Requirement %s never asserted" % r)
 
-for a in asserts.keys():
-	if not retracts.has_key(a):
+for a in list(asserts.keys()):
+	if a not in retracts:
 		fatal("Assertion %s never retracted" % a)
 
-for r in retracts.keys():
-	if not asserts.has_key(r):
+for r in list(retracts.keys()):
+	if r not in asserts:
 		fatal("Assertion %s never raised" % r)
 
 schedule = [ ]
@@ -213,14 +213,14 @@ del asserts[None]
 del retracts[None]
 
 # How to do multi-level trees here?
-for (condition, reqs) in requires.items():
+for (condition, reqs) in list(requires.items()):
 	schedule.append(asserts[condition])
 	schedule.extend(reqs)
 	ret = retracts[condition][0]
 	schedule.append(ret)
 	retracts[condition].remove(ret)
 
-for (condition,rets) in retracts.items():
+for (condition,rets) in list(retracts.items()):
 	for ret in rets:
 		schedule.append(asserts[condition])
 		schedule.append(ret)
@@ -287,5 +287,5 @@ if [ $tests_failed != 0 ]; then exit 1; fi
 ''')
 out.close()
 if subprocess.call(['sh', 'tests.sh'] + sys.argv[1:]) != 0:
-	print 'Tests failed!'
+	print('Tests failed!')
 	sys.exit(1)

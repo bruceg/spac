@@ -45,9 +45,9 @@ def copy(name):
 	try:
 		cstat = os.stat(name)
 		if fstat[8] > cstat[8]:
-			print "Warning, file '%s' is older than its source" % name
+			print("Warning, file '%s' is older than its source" % name)
 	except OSError:
-		print "Copying in special file '%s'" % name
+		print("Copying in special file '%s'" % name)
 		open(name, 'w').write(file)
 		_open_stat_cache[name] = tmp
 	return 1
