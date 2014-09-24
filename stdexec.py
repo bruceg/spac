@@ -14,7 +14,7 @@ def readlist(filename, dirname=None):
 	list = files.readlines(filename)
 	if list is None: raise IOError
 	if dirname:
-		list = list(map(lambda i,d=dirname:os.path.join(d,i), list))
+		list = [ os.path.join(dirname, i) for i in list ]
 	#list = map(os.path.normpath, list)
 	if debug: print("readlist(%s,%s)=>%s" % (filename,dirname,list))
 	return list

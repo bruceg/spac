@@ -16,4 +16,4 @@ elif base[-2] == '.' and base[-1] in '12345678':
 elif os.path.exists(target):
 	raise IOError
 else:
-	raise ValueError, "No source for %s found" % target
+	raise ValueError("No source for %s found" % target)
