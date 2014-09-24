@@ -23,14 +23,14 @@ if os.path.exists('spec'):
 	errors = 0
 	for path,var in badpaths.items():
 		if spec.find(path) >= 0:
-			print "Warning: Replace %s with '%%{%s}'" % (path, var)
+			print("Warning: Replace %s with '%%{%s}'" % (path, var))
 	if spec.find('\nCopyright:') > 0:
-		print "Warning: spec file says 'Copyright:' and not 'License:'"
+		print("Warning: spec file says 'Copyright:' and not 'License:'")
 	if spec.find('\nBuildRequires: bglibs') < 0:
-		print "Warning: spec file is missing bglibs reference"
+		print("Warning: spec file is missing bglibs reference")
 		#errors += 1
 	if errors:
-		print "%d errors in the spec file." % errors
+		print("%d errors in the spec file." % errors)
 		import sys
 		fail()
 	file('%s-%s.spec' % (package, version), spec)

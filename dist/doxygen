@@ -5,6 +5,6 @@ if os.path.exists('config.dxy'):
 	if m:
 		dxydir = m.group(1)
 		if os.system('rm -rf %s && doxygen config.dxy'%dxydir) != 0:
-			raise SystemError, "doxygen processing failed"
+			raise SystemError("doxygen processing failed")
 		file('config.dxy')
 		dir(dxydir)
