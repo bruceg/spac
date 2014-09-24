@@ -55,9 +55,7 @@ class FileList:
 			if item not in self.filelist:
 				self.filelist[item] = None
 	def keys(self):
-		list = list(self.filelist.keys())
-		list.sort()
-		return list
+		return sorted(list(self.filelist.keys()))
 	def __getitem__(self, key): return self.filelist[key]
 	def __setitem__(self, key, value): self.filelist[key] = value
 
