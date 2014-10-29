@@ -12,7 +12,7 @@ elif base[-2:] == '.1' and os.path.exists(base[:-2]+'.cli'):
 	command('cli-generate -w $< >$@')
 elif base[-2] == '.' and base[-1] in '12345678':
 	dependon([base])
-	command('man2html %(base)s >%(base)s.html' % locals())
+	command("man --html='cat %%s' ./%(base)s > %(base)s.html" % locals())
 elif os.path.exists(target):
 	raise IOError
 else:
