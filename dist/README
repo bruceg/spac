@@ -13,24 +13,24 @@ except IOError:
 	pass
 readme = open('README').read()
 if readme[:readme.index('\n')] != package:
-	print "README doesn't have the package name as the first line."
+	print("README doesn't have the package name as the first line.")
 	fail()
 if not re.search('^version %s$'%version, readme, re.MULTILINE|re.IGNORECASE):
-	print "README doesn't have the right version in it."
+	print("README doesn't have the right version in it.")
 	fail()
 if not re.search('^%s$'%today, readme, re.MULTILINE|re.IGNORECASE):
-	print "README doesn't have today's date in it."
+	print("README doesn't have today's date in it.")
 	fail()
 if not re.search('mailing list', readme, re.IGNORECASE):
-	print "README is missing a mailing list reference."
+	print("README is missing a mailing list reference.")
 	fail()
 if re.search('anonymous CVS', readme, re.IGNORECASE):
-	print "README contains an obsolete CVS reference."
+	print("README contains an obsolete CVS reference.")
 	fail()
 if not re.search('Copyright.*%s'%year, readme, re.IGNORECASE):
-	print "README is missing today's year in the copyright."
+	print("README is missing today's year in the copyright.")
 	fail()
 if re.search('lists\.em\.ca', readme, re.IGNORECASE):
-	print "README contains reference to obsoleted lists.em.ca site."
+	print("README contains reference to obsoleted lists.em.ca site.")
 	fail()
 file('README', readme)

@@ -1,4 +1,4 @@
-execfile('makedist.py')
+exec(compile(open('makedist.py').read(), 'makedist.py', 'exec'))
 
 re_line = re.compile('^------+$', re.MULTILINE)
 re_changes = re.compile('^Changes in version %s'%version,
