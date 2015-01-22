@@ -1,5 +1,6 @@
 cmd_extra = ''
 inc_extra = ''
+lib_extra = ''
 if not os.path.exists('no-bglibs'):
 	dependon(['conf-bgincs', 'conf-bglibs'])
 	cmd_extra = 'bgincs=`head -n 1 conf-bgincs`; \\\n' \
