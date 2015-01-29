@@ -26,6 +26,20 @@ def recurse_dir(dir):
 			list.extend(recurse_dir(fullpath))
 	return list
 
+class File:
+	def __init__(self, contents):
+		self.contents = contents
+	def write(self, filename):
+		out = open(filename, 'wb' if isinstance(self.contents, bytes) else 'w')
+		out.write(self.contents)
+		out.close()
+
+class Symlink:
+	def __init__(self, linkname):
+		self.linkname = linkname
+	def write(self, filename):
+		os.symlink(self.linkname, filename)
+
 class FileList:
 	def __init__(self):
 		self.filelist = { }
@@ -34,16 +48,22 @@ class FileList:
 		#	raise ValueError, "File '%s' already in list." % filename
 		if content is None:
 			try:
-				content = open(filename).read()
+				content = open(filename, 'rb').read()
 			except IOError:
 				raise SystemExit("Missing file: '%s'" % filename)
-		self.filelist[filename] = content
+		self.filelist[filename] = File(content)
 	def add_list(self, list):
 		for item in list:
 			self.add_one(item, None)
 	def add_dir(self, dir):
 		for item in recurse_dir(dir):
 			self.add_one(item, None)
+	def add_link(self, filename, link=None):
+		try:
+			linkname = os.readlink(filename)
+		except IOError:
+			raise SystemExit("Missing file: '%s'" % filename)
+		self.filelist[filename] = Symlink(linkname)
 	def del_one(self, filename):
 		if filename in self.filelist:
 			del self.filelist[filename]
@@ -84,6 +104,7 @@ def build_files(package, version):
 		'dir': files.add_dir,
 		'file': files.add_one,
 		'files': files.add_list,
+		'link': files.add_link,
 		'nofile': files.del_one,
 		'nofiles': files.del_list,
 		'package': package,
@@ -103,15 +124,13 @@ def copyfile(filename, contents, directory):
 		os.makedirs(dir, 0o755)
 	except OSError:
 		pass
-	out = open(filename, 'w')
-	out.write(contents)
-	out.close()
+	contents.write(filename)
 
 def main(package, version):
 	files = build_files(package, version)
 
 	filelist = list(files.keys())
-	files[FILES] = '\n'.join(filelist) + '\n'
+	files[FILES] = File('\n'.join(filelist) + '\n')
 	
 	base = package + "-" + version
 	os.mkdir(base, 0o777)
