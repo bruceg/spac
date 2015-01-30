@@ -4,7 +4,9 @@ if os.path.exists('config.dxy'):
 	m = re_dxydir.search(c)
 	if m:
 		dxydir = m.group(1)
-		if os.system('rm -rf %s && doxygen config.dxy'%dxydir) != 0:
+		remove(dxydir + '/html')
+		remove(dxydir + '/latex')
+		if os.system('doxygen config.dxy') != 0:
 			raise SystemError("doxygen processing failed")
 		file('config.dxy')
 		dir(dxydir)

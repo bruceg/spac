@@ -26,6 +26,14 @@ def recurse_dir(dir):
 			list.extend(recurse_dir(fullpath))
 	return list
 
+def remove_all(path):
+	if not os.path.islink(path) and os.path.isdir(path):
+		for name in os.listdir(path):
+			remove_all(os.path.join(path, name))
+		os.rmdir(path)
+	else:
+		os.unlink(path)
+
 class File:
 	def __init__(self, contents):
 		self.contents = contents
@@ -108,6 +116,7 @@ def build_files(package, version):
 		'nofile': files.del_one,
 		'nofiles': files.del_list,
 		'package': package,
+		'remove': remove_all,
 		'version': version,
 		}
 	try:
