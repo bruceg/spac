@@ -3,5 +3,5 @@
 @echo 'main() { ; }' >trylib-l%(base)s.c
 @{ ./compile trylib-l%(base)s.c && ./load trylib-l%(base)s -l%(base)s; } >/dev/null 2>&1 \
   && { echo -l%(base)s >%(base)s.lib; echo yes; } \
-  || { echo -n >%(base)s.lib; echo no; }
+  || { echo >%(base)s.lib; echo no; }
 @rm -f trylib-l%(base)s.c trylib-l%(base)s.o trylib-l%(base)s
