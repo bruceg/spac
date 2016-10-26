@@ -1,4 +1,7 @@
-source = base + '.c'
+for ext, compile in [('cc','compile++'),('cpp','compile++'),('c','compile')]:
+	source = '%s.%s' % (base, ext)
+	if os.path.exists(source):
+		break
+dependon([compile])
 dependon(scan_cpp(source) or [source])
-: compile
-./compile %(base)s.c
+command('./%(compile)s %(source)s' % locals())
